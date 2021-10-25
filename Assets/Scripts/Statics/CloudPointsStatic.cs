@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Objects;
 using UnityEngine;
 
 public static class CloudPointsStatic
@@ -9,15 +10,15 @@ public static class CloudPointsStatic
     private static int yMax = 10;
     private static int yMin = 0;
     
-    public static  Vector3[]  Create2DCloudPoints(int nbPoints)
+    public static  Point[]  Create2DCloudPoints(int nbPoints)
     {
-        Vector3[] points = new Vector3[nbPoints];
+        Point[] points = new Point[nbPoints];
         for (int i = 0; i < nbPoints; i++)
         {
-            points[i] = new Vector3(
+            points[i] =new Point(new Vector3(
                 Random.Range((float)xMin, (float)xMax), 
                 Random.Range((float)yMin, (float)yMax),
-                0f);
+                0f));
         }
         return points;
     }

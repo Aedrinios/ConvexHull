@@ -26,22 +26,6 @@ public class CloudPointsManager : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-        points = CloudPointsStatic.Create2DCloudPoints(50);
-        for (int i = 0; i < points.Length; i++)
-        {
-            points[i].Go = Instantiate(pointGo, points[i].Position, Quaternion.identity, container);
-        }
-
-        Vector3[] javisVec = JavisWalkStatic.Calculate(points);
-        convLr.positionCount = javisVec.Length;
-        for (int i = 0; i < javisVec.Length; i++)
-            convLr.SetPosition(i, javisVec[i]);
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -51,11 +35,34 @@ public class CloudPointsManager : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    public void GenerateCloudsPoints()
     {
-        // if (doSomething)
-        // {
-        //     JavisWalkStatic.Calculate()
-        // }
+        for (int i = 0; i < container.childCount; i++)
+        {
+            PointController pc;
+            if (container.GetChild(i).TryGetComponent(out pc))
+            {
+                pc.DestroyGO();
+            }
+        }
+        points = CloudPointsStatic.Create2DCloudPoints(50);
+        for (int i = 0; i < points.Length; i++)
+        {
+            points[i].Go = Instantiate(pointGo, points[i].Position, Quaternion.identity, container);
+        }
+    }
+    public void ResetLineRenderer()
+    {
+        convLr.positionCount = 0;
+    }
+
+    public Point[] GetPoints()
+    {
+        return points;
+    }
+
+    public LineRenderer GetLineRenderer()
+    {
+        return convLr;
     }
 }

@@ -17,7 +17,7 @@ public class CloudPointsManager : MonoBehaviour
     private bool doSomething = false;
 
     private int pointIndex = 0;
-
+    
     private void Awake()
     {
         if (!TryGetComponent(out convLr))
@@ -32,6 +32,13 @@ public class CloudPointsManager : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.A))
         {
             doSomething = true;
+            if (points != null)
+            {
+                Delaunay.IncrementalTriangulation(points);
+            }
+            
+            else
+                throw new System.Exception("Pas assez de points mon reuf");
         }
     }
 

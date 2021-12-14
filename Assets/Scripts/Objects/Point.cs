@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Objects
 {
@@ -11,7 +13,7 @@ namespace Objects
 
         public Point()
         {
-            
+            Position = Vector3.zero;
         }
 
         public Point(Vector3 pos)

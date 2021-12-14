@@ -17,6 +17,7 @@ public class CloudPointsManager : MonoBehaviour
     private Point[] points;
     private Point barycenter = new Point();
     public Matrix4x4 covarianceMatrix;
+    private int powerSearch = 100;
     private bool doSomething = false;
 
     private int pointIndex = 0;
@@ -32,6 +33,8 @@ public class CloudPointsManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+        
         if(Input.GetKeyDown(KeyCode.A))
         {
             doSomething = true;
@@ -112,17 +115,20 @@ public class CloudPointsManager : MonoBehaviour
     }
     
     // Eigen Vector c'est le nom anglais de Vecteur propre ptdr
-    public void PowerIteration(Matrix4x4 matrix)
+    public void PowerIteration(Matrix4x4 matrix, ref Vector3 eigenVector, ref float eigenValue)
     {
-        Vector3[] v = new Vector3[100];
+        Vector3[] v = new Vector3[powerSearch];
         v[0] = new Vector3(1, 0, 0);
         Vector3 resultMatrix;
-        float lambdaK;
-        for (int k = 0; k < 100; k++)
+        float lambdaK = 0;
+        for (int k = 0; k < v.Length - 1; k++)
         {
             resultMatrix = matrix * v[k];
             lambdaK = GetGreaterAbsoluteValueInVector3(resultMatrix);
             v[k + 1] = 1 / lambdaK * resultMatrix;
         }
+
+        eigenVector = v[v.Length].normalized;
+        eigenValue = lambdaK;
     }
 }

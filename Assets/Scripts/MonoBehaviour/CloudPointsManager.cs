@@ -6,7 +6,8 @@ using UnityEngine;
 
 public class CloudPointsManager : MonoBehaviour
 {
-    
+
+    public int amountOfPoints;
     [SerializeField] GameObject pointGo;
     [SerializeField] Transform container;
     
@@ -52,7 +53,7 @@ public class CloudPointsManager : MonoBehaviour
                 pc.DestroyGO();
             }
         }
-        points = CloudPointsStatic.Create2DCloudPoints(50);
+        points = CloudPointsStatic.Create2DCloudPoints(amountOfPoints);
         for (int i = 0; i < points.Length; i++)
         {
             points[i].Go = Instantiate(pointGo, points[i].Position, Quaternion.identity, container);

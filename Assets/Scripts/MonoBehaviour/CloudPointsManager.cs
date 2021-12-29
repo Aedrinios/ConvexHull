@@ -75,7 +75,7 @@ public class CloudPointsManager : MonoBehaviour
                 pc.DestroyGO();
             }
         }
-        points = CloudPointsStatic.Create2DCloudPoints(50);
+        points = CloudPointsStatic.Create2DCloudPoints(10);
         for (int i = 0; i < points.Length; i++)
         {
             points[i].Go = Instantiate(pointGo, points[i].Position, Quaternion.identity, container);

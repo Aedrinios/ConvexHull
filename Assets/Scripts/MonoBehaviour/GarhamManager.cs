@@ -28,7 +28,7 @@ public class GarhamManager : MonoBehaviour
         // for (int i = 0; i < points.Count; i++)
         //     convLr.SetPosition(i, points[i].Position);
         // convLr.SetPosition(points.Count, points[0].Position);
-        
+        //
         points = GrahamScanStatic.DeleteConcave(points);
         if (points.Count > 0)
         {

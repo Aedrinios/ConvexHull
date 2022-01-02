@@ -67,24 +67,26 @@ namespace Statics
             return angle;
         }
         /// <summary>
-        /// Calculate between three points 
+        /// Calculate between three points
+        /// return angle from 0 to 2PI for p1 relative to p2
         /// </summary>
         /// <param name="p0">Pivot</param>
         /// <param name="p1">p-1</param>
         /// <param name="p2">p+1</param>
         /// <returns>Radians</returns>
-        public static float GetAngle(Vector3 p0, Vector3 p1, Vector3 p2)
+        public static float GetAngle(Vector3 p1, Vector3 p2, Vector3 p3)
         {
-            Vector3 side1 = p1-p0;
-            Vector3 side2 = p2-p0;
-            // float angle =  Vector3.Angle(side1, side2);
-            float angle = GetAngle(side1, side2);
-            return angle;
-            // float numerator = p2.y * (p1.x - p3.x) + p1.y * (p3.x - p2.x) + p3.y * (p2.x - p1.x);
-            // float denominator = (p2.x - p1.x) * (p1.x - p3.x) + (p2.y - p1.y) * (p1.y - p3.y);
-            // float ratio = numerator / denominator;
-            // float a = Mathf.Atan(ratio);
-            // return a;
+            // Vector3 side1 = p1-p0;
+            // Vector3 side2 = p2-p0;
+            // float angle =  Vector3.SignedAngle(side1, side2, Vector3.up);
+            // //float angle = GetAngle(side1, side2);
+            // //Debug.Log("angle : " + angle);
+            // return angle;
+            float numerator = p2.y * (p1.x - p3.x) + p1.y * (p3.x - p2.x) + p3.y * (p2.x - p1.x);
+            float denominator = (p2.x - p1.x) * (p1.x - p3.x) + (p2.y - p1.y) * (p1.y - p3.y);
+            float ratio = numerator / denominator;
+            float a = Mathf.Atan(ratio);
+            return a;
         }
 
         /// <summary>
@@ -101,31 +103,70 @@ namespace Statics
 
         public static List<Point> DeleteConcave(List<Point> points)
         {
-            Point pInit = points[0];
-            Point pivot = points[0];
+            LinkedList<Point> tmp = new LinkedList<Point>(points);
             int i = 0;
+            LinkedListNode<Point> pInit = tmp.First;
+            LinkedListNode<Point> pivot = pInit;
             bool go = true;
             do
             {
-                int prevIndex = i - 1 < 0 ? points.Count - 1 : i - 1;
-                int nextIndex = i + 1 >= points.Count - 1 ? 0 : i + 1;
-                float f = GetAngle(points[i].Position, points[prevIndex].Position, points[nextIndex].Position);
-                if (f <= Mathf.PI )
+                float rad = GetAngle(pivot.Value.Position, GePrevious(pivot).Value.Position,
+                    GetNext(pivot).Value.Position);
+                float degree = rad * Mathf.Rad2Deg;
+                Debug.Log(degree);
+                if (rad <= 0)
                 {
-                    pivot = points[nextIndex];
+                    pivot =GetNext(pivot);
+                    go = true;
                 }
                 else
                 {
-                    pInit = points[prevIndex];
-                    points.Remove(points[i]);
+                    pInit = GePrevious(pivot);
+                    tmp.Remove(pivot);
+                    pivot = pInit;
                     go = false;
                 }
+            } while ((pivot.Value.Position != pInit.Value.Position || go == false ) && tmp.Count != 0);
 
-                i++;
-            } while (pivot != pInit && i <= points.Count-1);
+            points = new List<Point>(tmp);
+            // do
+            // {
+            //     
+            //     int prevIndex = i - 1 < 0 ? points.Count - 1 : i - 1;
+            //     int nextIndex = i + 1 >= points.Count - 1 ? 0 : i + 1;
+            //     Debug.Log("(" + prevIndex+", " + i + ", " + nextIndex+")" );
+            //     float f = GetAngle(points[i].Position, points[prevIndex].Position, points[nextIndex].Position) ;
+            //     if (f <= Mathf.PI )
+            //     {
+            //         pivot = points[nextIndex];
+            //         i = i + 1 >= points.Count - 1 ? 0 : i + 1;
+            //         go = true;
+            //     }
+            //     else
+            //     {
+            //         pInit = points[prevIndex];
+            //         points.Remove(points[i]);
+            //         //i = i - 1 < 0 ? points.Count - 1 : i - 1;
+            //         pivot = pInit;
+            //         
+            //         i = points.IndexOf(pivot);
+            //         Debug.Log("deleted : " + f);
+            //         go = false;
+            //     }
+            //
+            //
+            // } while ((pivot != pInit || go == false) );
 
             return points;
-
+        }
+        
+        private static LinkedListNode<T> GetNext<T>(LinkedListNode<T> current)
+        {
+            return current.Next ?? current.List.First;
+        }
+        private static LinkedListNode<T> GePrevious<T>(LinkedListNode<T> current)
+        {
+            return current.Previous ?? current.List.Last;
         }
     }
 }

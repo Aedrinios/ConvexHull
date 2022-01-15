@@ -2,9 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Objects;
 using UnityEngine;
 using Debug = System.Diagnostics.Debug;
+using Matrix4x4 = UnityEngine.Matrix4x4;
+using Quaternion = UnityEngine.Quaternion;
+using Vector3 = UnityEngine.Vector3;
 
 public class CloudPointsManager : MonoBehaviour
 {
@@ -15,6 +19,11 @@ public class CloudPointsManager : MonoBehaviour
     private LineRenderer convLr;
     
     private Point[] points;
+    private Vector3[] projectedPoints;
+    private Vector3 eigenVector;
+    private float eigenValue;
+    private Vector3 qL;
+    private Vector3 qK;
     private Point barycenter = new Point();
     public Matrix4x4 covarianceMatrix;
     private int powerSearch = 100;
@@ -70,65 +79,5 @@ public class CloudPointsManager : MonoBehaviour
     public LineRenderer GetLineRenderer()
     {
         return convLr;
-    }
-    
-    public void CalculateBarycenter()
-    {
-        foreach (Point p in points)
-        {
-            barycenter.Position += p.Position;
-        }
-
-        barycenter.Position /= points.Length;
-    }
-
-    public void CenteringPointToBarycenter()
-    {
-        foreach (Point p in points)
-        {
-            p.Position -= barycenter.Position;
-        }
-    }
-
-    public float CalculateCovariance(int index1,int index2)
-    {
-        float covariance = 0f;
-        foreach (Point p in points)
-            covariance += (1 / points.Length) * (p.Position[index1] - barycenter.Position[index1]) 
-                                              * (p.Position[index2] - barycenter.Position[index2]);
-
-        return covariance;
-    }
-
-    public void CreateCovarianceMatrix()
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-                covarianceMatrix[i,j] = CalculateCovariance(i, j);
-        }
-    }
-
-    public float GetGreaterAbsoluteValueInVector3(Vector3 v)
-    {
-        return Mathf.Max(Mathf.Max(Mathf.Abs(v.x), Mathf.Abs(v.y)), Mathf.Abs(v.z));
-    }
-    
-    // Eigen Vector c'est le nom anglais de Vecteur propre ptdr
-    public void PowerIteration(Matrix4x4 matrix, ref Vector3 eigenVector, ref float eigenValue)
-    {
-        Vector3[] v = new Vector3[powerSearch];
-        v[0] = new Vector3(1, 0, 0);
-        Vector3 resultMatrix;
-        float lambdaK = 0;
-        for (int k = 0; k < v.Length - 1; k++)
-        {
-            resultMatrix = matrix * v[k];
-            lambdaK = GetGreaterAbsoluteValueInVector3(resultMatrix);
-            v[k + 1] = 1 / lambdaK * resultMatrix;
-        }
-
-        eigenVector = v[v.Length].normalized;
-        eigenValue = lambdaK;
     }
 }

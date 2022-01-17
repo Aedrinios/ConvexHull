@@ -9,6 +9,7 @@ public class Bones : MonoBehaviour
     public List<Point> points = new List<Point>();
     [SerializeField] private GameObject displayedGameObject;
     private Vector3[] projectedPoints;
+    // Eigen Vector c'est le nom anglais de Vecteur propre
     private Vector3 eigenVector;
     private float eigenValue;
     private Vector3 qL;
@@ -38,12 +39,16 @@ public class Bones : MonoBehaviour
         DisplayResult();
     }
 
+    /// <summary>
+    /// Creer la liste de points
+    /// </summary>
     void init()
     {
         foreach (Vector3 vertice in mesh.vertices)
             points.Add(new Point(vertice));
     }
 
+    
     public void CalculateBarycenter()
     {
         foreach (Point p in points)
@@ -54,6 +59,10 @@ public class Bones : MonoBehaviour
         barycenter.Position /= points.Count;
     }
 
+    /// <summary>
+    /// Change les la position des points pour
+    /// que le barycenter soit l'origine des points
+    /// </summary>
     public void CenteringPointToBarycenter()
     {
         foreach (Point p in points)
@@ -62,6 +71,12 @@ public class Bones : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Quantification de variation des variables par rapport a eux 
+    /// </summary>
+    /// <param name="index1"></param>
+    /// <param name="index2"></param>
+    /// <returns></returns>
     public float CalculateCovariance(int index1, int index2)
     {
         float covariance = 0f;
@@ -71,11 +86,9 @@ public class Bones : MonoBehaviour
                 ((p.Position[index1] - barycenter.Position[index1]) *
                  (p.Position[index2] - barycenter.Position[index2])) / points.Count;
         }
-
         return covariance;
-
-    }
-
+    } 
+    
     public void CreateCovarianceMatrix()
     {
         for (int i = 0; i < 3; i++)
@@ -85,13 +98,21 @@ public class Bones : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Renvois la composante absolue la plus grande du vecteur (sans la convertir en abs)
+    /// </summary>
+    /// <param name="v"></param>
+    /// <returns></returns>
     public float GetGreaterAbsoluteValueInVector3(Vector3 v)
     {
         return Mathf.Max(Mathf.Max(Mathf.Abs(v.x), Mathf.Abs(v.y)), Mathf.Abs(v.z));
     }
-
-    // Eigen Vector c'est le nom anglais de Vecteur propre
-    public void PowerIteration()
+        
+    /// <summary>
+    /// Calcule le vecteur propre de la matrix de covariance
+    /// (Donne l'orientation du mesh)
+    /// </summary>
+     public void PowerIteration()
     {
         Vector3 vk = new Vector3(1, 0, 0);
         Vector3 resultMatrix;
@@ -102,11 +123,14 @@ public class Bones : MonoBehaviour
             lambdaK = GetGreaterAbsoluteValueInVector3(resultMatrix);
             vk = 1 / lambdaK * resultMatrix;
         }
-
+        // Eigen Vector c'est le nom anglais de Vecteur propre
         eigenVector = vk.normalized;
         eigenValue = lambdaK;
     }
 
+    /// <summary>
+    /// créer l'axe du mesh avec la bonne longueur
+    /// </summary>
     public void PointProjection()
     {
         projectedPoints = new Vector3[points.Count];
@@ -116,6 +140,9 @@ public class Bones : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Calcule le segment du mesh
+    /// </summary>
     public void FindAndCorrectExtremeProjection()
     {
         Vector3 farthestPositivePoint = Vector3.zero;
@@ -138,11 +165,13 @@ public class Bones : MonoBehaviour
                 }
             }
         }
-
         qK = farthestPositivePoint + barycenter.Position;
         qL = farthestNegativePoint + barycenter.Position;
     }
 
+    /// <summary>
+    /// affiche le resultat
+    /// </summary>
     void DisplayResult()
     {
         GameObject sphereQL = GameObject.CreatePrimitive(PrimitiveType.Cube);

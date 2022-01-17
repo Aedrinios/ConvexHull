@@ -66,10 +66,14 @@ public class Bones : MonoBehaviour
     {
         float covariance = 0f;
         foreach (Point p in points)
-            covariance += (1 / points.Count) * (p.Position[index1] - barycenter.Position[index1])
-                                             * (p.Position[index2] - barycenter.Position[index2]);
+        {
+            covariance +=
+                ((p.Position[index1] - barycenter.Position[index1]) *
+                 (p.Position[index2] - barycenter.Position[index2])) / points.Count;
+        }
 
         return covariance;
+
     }
 
     public void CreateCovarianceMatrix()
@@ -86,7 +90,7 @@ public class Bones : MonoBehaviour
         return Mathf.Max(Mathf.Max(Mathf.Abs(v.x), Mathf.Abs(v.y)), Mathf.Abs(v.z));
     }
 
-    // Eigen Vector c'est le nom anglais de Vecteur propre ptdr
+    // Eigen Vector c'est le nom anglais de Vecteur propre
     public void PowerIteration()
     {
         Vector3 vk = new Vector3(1, 0, 0);
@@ -118,14 +122,15 @@ public class Bones : MonoBehaviour
         Vector3 farthestNegativePoint = Vector3.zero;
         foreach (Vector3 p in projectedPoints)
         {
-            if (Vector3.Dot(p.normalized, Vector3.zero) > 0)
+            float alpha = Vector3.Dot(p, eigenVector);
+            if (alpha > 0)
             {
-                if (p.magnitude > farthestPositivePoint.magnitude)
+                if (p.sqrMagnitude > farthestPositivePoint.sqrMagnitude)
                 {
                     farthestPositivePoint = p;
                 }
             }
-            else if (Vector3.Dot(p.normalized, Vector3.zero) < 0)
+            else if (alpha < 0)
             {
                 if (p.magnitude > farthestNegativePoint.magnitude)
                 {
@@ -142,16 +147,22 @@ public class Bones : MonoBehaviour
     {
         GameObject sphereQL = GameObject.CreatePrimitive(PrimitiveType.Cube);
         GameObject sphereQK = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        sphereQL.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
-        sphereQK.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
         sphereQL.GetComponent<Renderer>().material.color = Color.green;
         sphereQK.GetComponent<Renderer>().material.color = Color.black;
         sphereQL.transform.position = qL;
         sphereQK.transform.position = qK;
-        
-        for (int i = 0; i < projectedPoints.Length; i++)
+
+        for (int i = 0; i < mesh.vertices.Length; i++)
         {
-            Instantiate(displayedGameObject, projectedPoints[i], Quaternion.identity, transform);
+            Instantiate(displayedGameObject, mesh.vertices[i], Quaternion.identity, transform);
         }
+        
+        
+    }
+    
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(qL, qK);
     }
 }

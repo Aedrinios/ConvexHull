@@ -328,7 +328,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6aed06f53b0fb2c4197debfe42ff144f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mesh: {fileID: 3740082393857908786, guid: c12719acb3bb95f489a26f1787d6d694, type: 3}
+  mesh: {fileID: 6750818483517903588, guid: 9490e551d87a9c94db61b9ecbbd330b9, type: 3}
   displayedGameObject: {fileID: 8233327308343019187, guid: 4c5f827b58bf98b4bb94b97a361d134d, type: 3}
 --- !u!4 &1607137998
 Transform:
@@ -338,7 +338,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1607137996}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.44584262, y: 6.041646, z: -14.563186}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

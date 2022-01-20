@@ -49,7 +49,7 @@ public static class BonesStatic
         // Projection des points
         Vector3[] projectedPoints = new Vector3[points.Count];
         for (int i = 0; i < points.Count; i++)
-            projectedPoints[i] = Vector3.Scale(Vector3.Scale(points[i].Position, eigenVector), eigenVector);
+            projectedPoints[i] = Vector3.Dot(points[i].Position, eigenVector) *eigenVector;
         
 
         // Calcul des extremes du segment 
@@ -98,6 +98,18 @@ public static class BonesStatic
     /// <returns></returns>
     private static float GetGreaterAbsoluteValueInVector3(Vector3 v)
     {
-        return Mathf.Max(Mathf.Max(Mathf.Abs(v.x), Mathf.Abs(v.y)), Mathf.Abs(v.z));
+        float xAbs = Mathf.Abs(v.x);
+        float yAbs = Mathf.Abs(v.y);
+        float zAbs = Mathf.Abs(v.z);
+
+        if (xAbs < yAbs)
+        {
+            if (yAbs < zAbs) return v.z;
+
+            return v.y;
+        }
+        if (xAbs < zAbs) return v.z;
+
+        return v.x;
     }
 }

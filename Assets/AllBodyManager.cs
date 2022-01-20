@@ -41,8 +41,8 @@ public class AllBodyManager : MonoBehaviour
     // }
     [SerializeField] private GameObject model;
     [SerializeField] private GameObject displayedGameObject;
-    
-    
+    private List<Bone> bones = new List<Bone>();
+
     private void Start()
     {
         for (int i = 0; i < model.transform.childCount; i++)
@@ -51,7 +51,9 @@ public class AllBodyManager : MonoBehaviour
             MeshFilter mf;
             if (trans.TryGetComponent(out mf))
             {
-                DisplayResult(new Bone(mf.sharedMesh));
+                Bone b = new Bone(mf.sharedMesh, trans);
+                bones.Add(b);
+                DisplayResult(b);
             }
             else
             {
@@ -59,24 +61,37 @@ public class AllBodyManager : MonoBehaviour
             }
         }
     }
-
+    private void OnDrawGizmos()
+    {
+        if (bones != null)
+        {
+            foreach (Bone b in bones)
+            {
+                Gizmos.color = Color.yellow;
+                // Gizmos.DrawLine(b.qL + b.TransformOrigin.position, b.qK+ b.TransformOrigin.position);
+                Gizmos.DrawLine(b.qL, b.qK);
+                Debug.Log( " ql :" +b.qL+ " qk :"+ b.qK);
+            }
+        }
+    }
     void DisplayResult(Bone bone)
     {
-        if (bone.mesh)
+        if (bone.points != null && bone.points.Count != 0)
         {
+            GameObject go = new GameObject();
+            
+            // GameObject sphereQL = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            // GameObject sphereQK = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            // sphereQK.transform.localScale = Vector3.one * 0.001f; 
+            // sphereQL.transform.localScale = Vector3.one * 0.001f; 
+            // sphereQL.GetComponent<Renderer>().material.color = Color.green;
+            // sphereQK.GetComponent<Renderer>().material.color = Color.black;
+            // sphereQL.transform.position = bone.qL;
+            // sphereQK.transform.position = bone.qK;
 
-            GameObject sphereQL = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            GameObject sphereQK = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            sphereQK.transform.localScale = Vector3.one * 0.001f; 
-            sphereQL.transform.localScale = Vector3.one * 0.001f; 
-            sphereQL.GetComponent<Renderer>().material.color = Color.green;
-            sphereQK.GetComponent<Renderer>().material.color = Color.black;
-            sphereQL.transform.position = bone.qL;
-            sphereQK.transform.position = bone.qK;
-
-            for (int i = 0; i < bone.mesh.vertices.Length; i++)
+            for (int i = 0; i < bone.points.Count; i++)
             {
-                Instantiate(displayedGameObject, bone.mesh.vertices[i], Quaternion.identity, transform);
+                Instantiate(displayedGameObject, bone.points[i].Position, Quaternion.identity, go.transform);
             }
         }
     }

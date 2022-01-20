@@ -5,22 +5,21 @@ namespace Objects
 {
     public class Bone
     {
-        public Mesh mesh { get; private set; }
-
-        private List<Point> points = new List<Point>();
+        private Mesh mesh { get; set; }
+        private Transform worldTransform;
+        public List<Point> points { get; private set; } = new List<Point>();
         private Matrix3x3 covarianceMatrix = new Matrix3x3();
         private Point barycenter = new Point();
-        private Vector3[] projectedPoints;
         public Vector3 qL { get; private set; } = new Vector3();
         public Vector3 qK { get; private set; }= new Vector3();
         private int powerSearch;
         
-        public Bone(Mesh m, int powerSearch = 100)
+        public Bone(Mesh m,Transform worldTransform, int powerSearch = 100)
         {
+            this.worldTransform = worldTransform;
             mesh = m;
             this.powerSearch = powerSearch;
             Init();
-
         }
         public Bone(GameObject go, int powerSearch = 100)
         {
@@ -40,14 +39,38 @@ namespace Objects
         /// Creer la liste de points
         /// Génère le segment du bones
         /// </summary>
-        void Init()
+        public void Init()
         {
-            foreach (Vector3 vertice in mesh.vertices)
-                points.Add(new Point(vertice));
-            projectedPoints = new Vector3[points.Count];
-            
+            // foreach (Vector3 vertice in mesh.vertices)
+            //     points.Add(new Point(vertice + worldTransform.position));
+            // Renderer rend;
+            // if (worldTransform.TryGetComponent(out rend))
+            // {
+            //     Debug.Log(worldTransform.name);
+            //     Vector3 center = rend.bounds.center;
+            //     Quaternion newRot = new Quaternion();
+            //     
+            //     Vector3 eulerAng = worldTransform.localRotation.eulerAngles; 
+            //     newRot.eulerAngles = new Vector3(eulerAng.x, eulerAng.y, eulerAng.z);
+            //     for (int i = 0; i < points.Count; i++)
+            //     {
+            //         points[i].Position = newRot * (points[i].Position - center) + center;
+            //     }
+            // }
+            //
+            //Debug.Log("QL : " + qL + " QK : " + qK);
+            foreach (Vector3 v in mesh.vertices)
+                points.Add( new Point((v + worldTransform.position)));
+
+            //Rotation
+            Quaternion newRotation = new Quaternion();
+            newRotation.eulerAngles = worldTransform.rotation.eulerAngles;
+            for (int i=0; i<points.Count; i++)
+            {
+                points[i].Position = newRotation * (points[i].Position - worldTransform.position) + worldTransform.position;
+            }
             (qL, qK) = BonesStatic.CreateSkeleton(points, powerSearch);
-            Debug.Log("QL : " + qL + " QK : " + qK);
+            //______ACP______
         }
     }
 }

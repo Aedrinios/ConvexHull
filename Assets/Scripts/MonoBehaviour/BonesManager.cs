@@ -16,8 +16,8 @@ public class BonesManager : MonoBehaviour
     /// </summary>
     public void CreateSkeletonOnButton()
     {
-        bone = new Bone(mesh);
-        DisplayResult();
+       // bone = new Bone(mesh);
+        //DisplayResult();
     }
 
     /// <summary>

@@ -5,15 +5,19 @@ using UnityEngine;
 
 public static class BonesStatic
 {
-    public static (Vector3, Vector3) CreateSkeleton(List<Point> points, int powerSearch)
+    public static (Vector3, Vector3) CreateSkeleton(List<Point> pP, int powerSearch)
     {
+        List<Point> points = new List<Point>();
         //Initialisation des valeurs
         Point barycenter = new Point();
         Matrix3x3 covarianceMatrix = new Matrix3x3();
 
         // Calcul du barycentre
-        foreach (Point p in points)
+        foreach (Point p in pP)
+        {
+            points.Add(new Point(p.Position));
             barycenter.Position += p.Position;
+        }
 
         barycenter.Position /= points.Count;
 
@@ -24,14 +28,13 @@ public static class BonesStatic
 
         // Calcul de la matrice de covariance
         for (int i = 0; i < 3; i++)
-        {
             for (int j = 0; j < 3; j++)
                 covarianceMatrix[i, j] = CalculateCovariance(points, barycenter, i, j);
-        }
+        
 
         // Calcule le vecteur propre de la matrix de covariance
         // (Donne l'orientation du mesh)
-        Vector3 vk = new Vector3(1, 0, 0);
+        Vector3 vk = new Vector3(0, 0,1);
         Vector3 resultMatrix;
         float lambdaK = 0;
         for (int k = 0; k < powerSearch; k++)

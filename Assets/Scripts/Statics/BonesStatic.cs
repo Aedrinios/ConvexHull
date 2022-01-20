@@ -20,18 +20,18 @@ public static class BonesStatic
         }
 
         barycenter.Position /= points.Count;
+        
+        // Calcul de la matrice de covariance
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                covarianceMatrix[i, j] = CalculateCovariance(points, barycenter, i, j);
+
 
         // Change les la position des points pour
         // que le barycenter soit l'origine des points
         foreach (Point p in points)
             p.Position -= barycenter.Position;
-
-        // Calcul de la matrice de covariance
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
-                covarianceMatrix[i, j] = CalculateCovariance(points, barycenter, i, j);
         
-
         // Calcule le vecteur propre de la matrix de covariance
         // (Donne l'orientation du mesh)
         Vector3 vk = new Vector3(0, 0,1);

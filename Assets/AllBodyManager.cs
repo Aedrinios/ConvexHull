@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using Objects;
 using UnityEngine;
+using Quaternion = UnityEngine.Quaternion;
+using Vector3 = UnityEngine.Vector3;
 
 public class AllBodyManager : MonoBehaviour
 {
@@ -40,8 +43,15 @@ public class AllBodyManager : MonoBehaviour
     //     
     // }
     [SerializeField] private GameObject model;
+    [SerializeField] private float joinEpsilon = 0.5f;
+    [Header("Debug")]
+    [SerializeField] private bool showPoints = false;
     [SerializeField] private GameObject displayedGameObject;
+    [SerializeField] private Color boneColor = Color.yellow;
+    [SerializeField] private Color jointColor = Color.red;
+    [SerializeField] private float jointRadius = 1f;
     private List<Bone> bones = new List<Bone>();
+    
 
     private void Start()
     {
@@ -53,23 +63,64 @@ public class AllBodyManager : MonoBehaviour
             {
                 Bone b = new Bone(mf.sharedMesh, trans);
                 bones.Add(b);
-                DisplayResult(b);
+                if(showPoints)DisplayResult(b);
             }
             else
             {
                 Debug.LogError(trans.name + " n'a pas de MeshFilter");
             }
         }
+
+        JointBones();
     }
+
+    private void JointBones()
+    {
+        for(int i = 0;i < bones.Count; i++)
+        {
+            Bone currentBone = bones[i];
+            
+            for(int j = i;j < bones.Count; j++){
+                Bone otherBone = bones[j];
+                bool matched = false;
+                if(JoinByProximity(ref currentBone.qL, ref otherBone.qL, joinEpsilon)) matched = true;
+                if(JoinByProximity(ref currentBone.qL, ref otherBone.qK, joinEpsilon)) matched = true;
+                if(JoinByProximity(ref currentBone.qK, ref otherBone.qL, joinEpsilon)) matched = true;
+                if(JoinByProximity(ref currentBone.qK, ref otherBone.qK, joinEpsilon)) matched = true;
+                currentBone.bonesJointed += matched ? 1 : 0;
+            }    
+        }
+    }
+
+    public static bool JoinByProximity(ref Vector3 a, ref Vector3 b, float epsilon)
+    {
+        float absX = Mathf.Abs(a.x - b.x);
+        float absY = Mathf.Abs(a.y - b.y);
+        float absZ = Mathf.Abs(a.z - b.z);
+        float proximity = new Vector3(absX, absY, absZ).magnitude;
+        if (proximity < epsilon)
+        {
+            Vector3 moy = (a + b) / 2.0f;
+            a = moy;
+            b = moy;
+            return true;
+        }
+        
+        return false;
+    }
+
     private void OnDrawGizmos()
     {
         if (bones != null)
         {
             foreach (Bone b in bones)
             {
-                Gizmos.color = Color.yellow;
+                Gizmos.color = boneColor;
                 // Gizmos.DrawLine(b.qL + b.TransformOrigin.position, b.qK+ b.TransformOrigin.position);
                 Gizmos.DrawLine(b.qL, b.qK);
+                Gizmos.color = jointColor;
+                Gizmos.DrawSphere(b.qL, jointRadius);
+                Gizmos.DrawSphere(b.qK, jointRadius);
                 Debug.Log( " ql :" +b.qL+ " qk :"+ b.qK);
             }
         }

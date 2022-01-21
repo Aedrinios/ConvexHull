@@ -10,8 +10,9 @@ namespace Objects
         public List<Point> points { get; private set; } = new List<Point>();
         private Matrix3x3 covarianceMatrix = new Matrix3x3();
         private Point barycenter = new Point();
-        public Vector3 qL { get; private set; } = new Vector3();
-        public Vector3 qK { get; private set; }= new Vector3();
+        public Vector3 qL = new Vector3();
+        public Vector3 qK = new Vector3();
+        public int bonesJointed = 0;//nombre de bones reliés à notre bone 
         private int powerSearch;
         
         public Bone(Mesh m,Transform worldTransform, int powerSearch = 100)

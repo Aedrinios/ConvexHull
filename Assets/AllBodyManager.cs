@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text.RegularExpressions;
 using Objects;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
@@ -43,14 +44,18 @@ public class AllBodyManager : MonoBehaviour
     //     
     // }
     [SerializeField] private GameObject model;
-    [SerializeField] private float joinEpsilon = 0.5f;
+    [SerializeField] private float joinEpsilon = 5f;
+    [SerializeField] private float epsilonBonesManquant = 15f;
     [Header("Debug")]
     [SerializeField] private bool showPoints = false;
+    [SerializeField] private bool showJoints = false;
     [SerializeField] private GameObject displayedGameObject;
     [SerializeField] private Color boneColor = Color.yellow;
+    [SerializeField] private Color jointBoneColor = Color.blue;
     [SerializeField] private Color jointColor = Color.red;
     [SerializeField] private float jointRadius = 1f;
     private List<Bone> bones = new List<Bone>();
+    private List<Joint> joints = new List<Joint>();
     
 
     private void Start()
@@ -72,6 +77,55 @@ public class AllBodyManager : MonoBehaviour
         }
 
         JointBones();
+        ConvertToJoints();
+        AddMissingBones();
+        Debug.Log("Nb of bone ends : " + bones.Count*2);
+        Debug.Log("Nb of joints found : " + joints.Count);
+    }
+
+
+    private void AddMissingBones()
+    {
+        for(int i = 0;i < joints.Count; i++)
+        {
+            Joint currentJoint = joints[i];
+            for(int j = i;j < joints.Count; j++){
+                Joint otherJoint = joints[j];
+                Debug.Log("CurrentJoint : " + currentJoint.pos + " otherJoint : " + otherJoint.pos);
+                if (!CheckProximity(currentJoint.pos, otherJoint.pos, 0.001f) && 
+                CheckProximity(currentJoint.pos, otherJoint.pos, epsilonBonesManquant))
+                {
+                    Bone b = new Bone(currentJoint.pos,otherJoint.pos);
+                    bones.Add(b);
+                }
+            }    
+        }
+    }
+
+    private void ConvertToJoints()
+    {
+        joints = new List<Joint>();
+        for (int i = 0; i < bones.Count; i++)
+        {
+            Bone b = bones[i];
+            if (!CheckPointAlreadyStored(b.qL)) joints.Add(new Joint(b.qL));
+            if (!CheckPointAlreadyStored(b.qK)) joints.Add(new Joint(b.qK));
+        }
+    }
+
+    private bool CheckPointAlreadyStored(Vector3 p)
+    {
+        bool alreadyStored = false;
+        foreach (Joint j in joints)
+        {
+            if ((j.pos - p).magnitude < 0.01f)
+            {
+                alreadyStored = true;
+                break;
+            }
+        }
+
+        return alreadyStored;
     }
 
     private void JointBones()
@@ -82,46 +136,62 @@ public class AllBodyManager : MonoBehaviour
             
             for(int j = i;j < bones.Count; j++){
                 Bone otherBone = bones[j];
-                bool matched = false;
-                if(JoinByProximity(ref currentBone.qL, ref otherBone.qL, joinEpsilon)) matched = true;
-                if(JoinByProximity(ref currentBone.qL, ref otherBone.qK, joinEpsilon)) matched = true;
-                if(JoinByProximity(ref currentBone.qK, ref otherBone.qL, joinEpsilon)) matched = true;
-                if(JoinByProximity(ref currentBone.qK, ref otherBone.qK, joinEpsilon)) matched = true;
-                currentBone.bonesJointed += matched ? 1 : 0;
+                
+                bool matched = false;//stocke si on a trouvé une correspondance
+                if (JoinByProximity(ref currentBone.qL, ref otherBone.qL, joinEpsilon)) matched = true;
+                if (JoinByProximity(ref currentBone.qL, ref otherBone.qK, joinEpsilon)) matched = true;
+                if (JoinByProximity(ref currentBone.qK, ref otherBone.qL, joinEpsilon)) matched = true;
+                if (JoinByProximity(ref currentBone.qK, ref otherBone.qK, joinEpsilon)) matched = true;
+                currentBone.bonesJointed += matched||matched ? 1 : 0;
             }    
         }
     }
 
     public static bool JoinByProximity(ref Vector3 a, ref Vector3 b, float epsilon)
     {
-        float absX = Mathf.Abs(a.x - b.x);
-        float absY = Mathf.Abs(a.y - b.y);
-        float absZ = Mathf.Abs(a.z - b.z);
-        float proximity = new Vector3(absX, absY, absZ).magnitude;
-        if (proximity < epsilon)
+        if (CheckProximity(a, b, epsilon))
         {
             Vector3 moy = (a + b) / 2.0f;
             a = moy;
             b = moy;
             return true;
         }
-        
         return false;
+    }
+
+    private static bool CheckProximity(Vector3 a, Vector3 b, float epsilon)
+    {
+        float absX = Mathf.Abs(a.x - b.x);
+        float absY = Mathf.Abs(a.y - b.y);
+        float absZ = Mathf.Abs(a.z - b.z);
+        float proximity = new Vector3(absX, absY, absZ).magnitude;
+        return proximity < epsilon;
     }
 
     private void OnDrawGizmos()
     {
         if (bones != null)
         {
-            foreach (Bone b in bones)
+            if (showJoints)
             {
-                Gizmos.color = boneColor;
-                // Gizmos.DrawLine(b.qL + b.TransformOrigin.position, b.qK+ b.TransformOrigin.position);
-                Gizmos.DrawLine(b.qL, b.qK);
-                Gizmos.color = jointColor;
-                Gizmos.DrawSphere(b.qL, jointRadius);
-                Gizmos.DrawSphere(b.qK, jointRadius);
-                Debug.Log( " ql :" +b.qL+ " qk :"+ b.qK);
+                foreach (Joint joint in joints)
+                {
+                    Gizmos.color = jointColor;
+                    Gizmos.DrawSphere(joint.pos, jointRadius);
+                }
+            }
+            else
+            {
+                foreach (Bone b in bones)
+                {
+                    Gizmos.color = b.isJoin ? jointBoneColor : boneColor;
+                    // Gizmos.DrawLine(b.qL + b.TransformOrigin.position, b.qK+ b.TransformOrigin.position);
+                    Gizmos.DrawLine(b.qL, b.qK);
+                    Gizmos.color = jointColor;
+                    Gizmos.DrawSphere(b.qL, jointRadius);
+                    Gizmos.DrawSphere(b.qK, jointRadius);
+                    //Debug.Log( " ql :" +b.qL+ " qk :"+ b.qK);
+                }
             }
         }
     }

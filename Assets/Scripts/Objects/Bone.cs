@@ -14,7 +14,14 @@ namespace Objects
         public Vector3 qK = new Vector3();
         public int bonesJointed = 0;//nombre de bones reliés à notre bone 
         private int powerSearch;
-        
+        public bool isJoin { get; private set; } = false;
+
+        public Bone(Vector3 pointA, Vector3 pointB)
+        {
+            qL = pointA;
+            qK = pointB;
+            isJoin = true;
+        }
         public Bone(Mesh m,Transform worldTransform, int powerSearch = 100)
         {
             this.worldTransform = worldTransform;

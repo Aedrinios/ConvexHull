@@ -20,6 +20,7 @@ public class GarhamManager : MonoBehaviour
         }
 
         points = points.OrderBy(x => x.Angle).ToList();
+        
         CloudPointsManager.Instance.SetPoint(points.ToArray());
         CloudPointsManager.Instance.ShowSort();
         

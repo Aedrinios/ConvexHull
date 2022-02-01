@@ -10,26 +10,27 @@ namespace Statics
     {
         public static List<Point> SortPoints(List<Point> points, Point bc = null)
         {
-            if (bc == null )
+            if (bc == null)
             {
                 throw new Exception("IMPLEMENTE LE BARRYCENTRE EN FAITE");
             }
-        
+
             for (int i = 0; i < points.Count; i++)
             {
                 points[i].Position -= bc.Position;
             }
 
-            points = points.OrderBy(x => 
-                    ComparePoints(bc.Position, x.Position, bc.Position + Vector3.right * 2)).ToList();
-            
+            points = points.OrderBy(x =>
+                ComparePoints(bc.Position, x.Position, bc.Position + Vector3.right * 2)).ToList();
+
             for (int i = 0; i < points.Count; i++)
             {
                 points[i].Position += bc.Position;
             }
+
             return points;
         }
-        
+
         /// <summary>
         ///  returns true in the cases where the first angle is bigger than the second angle.
         /// In the cases where the angles are equal, or the first distance is less
@@ -51,7 +52,7 @@ namespace Statics
                 return true;
             return false;
         }
-        
+
         /// <summary>
         /// return angle from 0 to 2PI for p1 relative to p2
         /// </summary>
@@ -60,12 +61,13 @@ namespace Statics
         /// <returns></returns>
         public static float GetAngle(Vector3 side1, Vector3 side2)
         {
-            Vector3 v =side2-side1;
+            Vector3 v = side2 - side1;
             float angle = Mathf.Atan2(v.x, v.y);
             if (angle <= 0)
                 angle = 2 * Mathf.PI + angle;
             return angle;
         }
+
         /// <summary>
         /// Calculate between three points
         /// return angle from 0 to 2PI for p1 relative to p2
@@ -76,17 +78,7 @@ namespace Statics
         /// <returns>Radians</returns>
         public static float GetAngle(Vector3 p1, Vector3 p2, Vector3 p3)
         {
-            // Vector3 side1 = p1-p0;
-            // Vector3 side2 = p2-p0;
-            // float angle =  Vector3.SignedAngle(side1, side2, Vector3.up);
-            // //float angle = GetAngle(side1, side2);
-            // //Debug.Log("angle : " + angle);
-            // return angle;
-            float numerator = p2.y * (p1.x - p3.x) + p1.y * (p3.x - p2.x) + p3.y * (p2.x - p1.x);
-            float denominator = (p2.x - p1.x) * (p1.x - p3.x) + (p2.y - p1.y) * (p1.y - p3.y);
-            float ratio = numerator / denominator;
-            float a = Mathf.Atan(ratio);
-            return a;
+            return Vector2.SignedAngle(p3 - p1, p2 - p1);
         }
 
         /// <summary>
@@ -97,26 +89,53 @@ namespace Statics
         /// <returns></returns>
         public static float GetDistance(Vector3 p1, Vector3 p2)
         {
-            Vector3 v =p1-p2;
+            Vector3 v = p1 - p2;
             return Mathf.Sqrt(v.x * v.x + v.y * v.y);
         }
 
         public static List<Point> DeleteConcave(List<Point> points)
         {
+            // List<Point> L = points;
+            // Point S = points[0];
+            // Point pivot = S;
+            // bool go = true;
+            // do
+            // {
+            //     int index = L.FindIndex(a => a == pivot);
+            //
+            //     int previous = index - 1 < 0 ? L.Count - 1 : index - 1;
+            //     int next = index + 1 > L.Count - 1 ? 0 : index + 1;
+            //     float angle = Vector2.SignedAngle(L[next].Position - pivot.Position,
+            //         L[previous].Position - pivot.Position);
+            //     if (angle > 180 || angle < 0)
+            //     {
+            //         pivot = L[next];
+            //         go = true;
+            //     }
+            //     else
+            //     {
+            //         S = L[previous];
+            //         L.Remove(pivot);
+            //         pivot = S;
+            //         go = false;
+            //     }
+            // } while (pivot != S || !go);
+
+
             LinkedList<Point> tmp = new LinkedList<Point>(points);
             int i = 0;
             LinkedListNode<Point> pInit = tmp.First;
             LinkedListNode<Point> pivot = pInit;
             bool go = true;
+
             do
             {
                 float rad = GetAngle(pivot.Value.Position, GePrevious(pivot).Value.Position,
                     GetNext(pivot).Value.Position);
-                float degree = rad * Mathf.Rad2Deg;
-                Debug.Log(degree);
-                if (rad <= 0)
+                //         L[previous].Position - pivot.Position);
+                if (rad > 180 || rad < 0)
                 {
-                    pivot =GetNext(pivot);
+                    pivot = GetNext(pivot);
                     go = true;
                 }
                 else
@@ -126,9 +145,11 @@ namespace Statics
                     pivot = pInit;
                     go = false;
                 }
-            } while ((pivot.Value.Position != pInit.Value.Position || go == false ) && tmp.Count != 0);
+            } while ((pivot.Value.Position != pInit.Value.Position || go == false));
 
             points = new List<Point>(tmp);
+
+
             // do
             // {
             //     
@@ -159,11 +180,12 @@ namespace Statics
 
             return points;
         }
-        
+
         private static LinkedListNode<T> GetNext<T>(LinkedListNode<T> current)
         {
             return current.Next ?? current.List.First;
         }
+
         private static LinkedListNode<T> GePrevious<T>(LinkedListNode<T> current)
         {
             return current.Previous ?? current.List.Last;

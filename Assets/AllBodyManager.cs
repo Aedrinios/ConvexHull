@@ -75,7 +75,7 @@ public class AllBodyManager : MonoBehaviour
                 Debug.LogError(trans.name + " n'a pas de MeshFilter");
             }
         }
-
+        
         JointBones();
         ConvertToJoints();
         AddMissingBones();

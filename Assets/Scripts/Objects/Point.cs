@@ -26,6 +26,8 @@ namespace Objects
             this.Position = pos;
         }
 
+        public float Angle { get; set; }
+
         public void ApplyMat(Material mat)
         {
             Renderer rend;

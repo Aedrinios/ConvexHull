@@ -81,6 +81,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   amountOfPoints: 50
   pointGo: {fileID: 8233327308343019187, guid: 239d981f6333ae84bab4d2c2a62075c2, type: 3}
+  barrycenterPrefab: {fileID: 8233327308343019187, guid: b893a6ab7c371884cb24da9c4f190c9e, type: 3}
   container: {fileID: 235797972}
 --- !u!120 &477154877
 LineRenderer:

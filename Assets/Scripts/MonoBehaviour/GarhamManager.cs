@@ -13,11 +13,8 @@ public class GarhamManager : MonoBehaviour
            && CloudPointsManager.Instance.GetPoints().Length > 0))
             CloudPointsManager.Instance.GenerateCloudsPoints();
         List<Point> points = CloudPointsManager.Instance.GetPoints().ToList();
-        Point bc = CloudPointsManager.Instance.GetBarrycenter();
-
         LineRenderer convLr = CloudPointsManager.Instance.GetLineRenderer();
-        
-        points = GrahamScanStatic.Compute(points, bc);
+        points = GrahamScanStatic.Compute(points);
         if (points.Count > 0)
         {
             convLr.positionCount = points.Count + 1;

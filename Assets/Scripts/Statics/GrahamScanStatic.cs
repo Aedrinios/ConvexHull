@@ -8,8 +8,15 @@ namespace Statics
 {
     public static class GrahamScanStatic
     {
-        public static List<Point> Compute(List<Point> points, Point barryCenter)
+        public static List<Point> Compute(List<Point> points)
         {
+            Point barryCenter = new Point();
+            for (int i = 0; i < points.Count; i++)
+            {
+                barryCenter.Position += points[i].Position;
+            }
+            barryCenter.Position /= points.Count;
+            
             for (int i = 0; i < points.Count; i++)
             {
                 points[i].Angle = GrahamScanStatic.GetAngle(barryCenter.Position, points[i].Position);

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Objects;
+using UnityEngine;
 
 namespace Objects
 {
@@ -49,6 +50,13 @@ namespace Objects
                 }
             }
             return hasCommonPoint ? new Edge(p1, p2) : null;
+        }
+
+        public void DisplayEdge(ref LineRenderer lr)
+        {
+            lr.SetPosition(i, points[0].Position);
+            lr.SetPosition(points.Count, points[1].Position);
+
         }
     }
 }

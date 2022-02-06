@@ -48,5 +48,10 @@ namespace Objects
 
             return null;
         }
+
+        public void DisplayTriangle()
+        {
+            
+        }
     }
 }

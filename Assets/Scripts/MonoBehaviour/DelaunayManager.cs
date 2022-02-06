@@ -89,21 +89,7 @@ public class DelaunayManager : MonoBehaviour
 
         Point pqplus1 = sortedPoints[pointsPassed.Count + 1];
         List<Point> polygon = pointsPassed;
-        Vector3 barycenter = Vector3.zero;
-        for (int b = 0; b < polygon.Count; b++)
-        {
-            barycenter += polygon[b].Position;
-        }
-
-        barycenter /= polygon.Count;
-
-        foreach (Point point in polygon)
-        {
-            point.Angle = GrahamScanStatic.GetAngle(barycenter, point.Position);
-        }
-
-        polygon = polygon.OrderBy(x => x.Angle).ToList();
-        polygon = GrahamScanStatic.DeleteConcave(polygon);
+        polygon = GrahamScanStatic.Compute(polygon);
 
         for (int p = 0; p < polygon.Count; p++)
         {
@@ -124,7 +110,10 @@ public class DelaunayManager : MonoBehaviour
 
     private void DisplayIncrementation()
     {
-        
+        foreach (Triangle t in triangles)
+        {
+            t.DisplayTriangle();
+        }
     }
 
     private void Triangulate(Point a, Point b, Point c)

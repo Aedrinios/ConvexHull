@@ -11,7 +11,8 @@ public class CloudPointsManager : MonoBehaviour
     [SerializeField] GameObject pointGo;
     [SerializeField] GameObject barrycenterPrefab;
     [SerializeField] Transform container;
-    
+    [SerializeField] Transform container3D;
+
     private LineRenderer convLr;
     
     private Point[] points;
@@ -84,6 +85,28 @@ public class CloudPointsManager : MonoBehaviour
 
         barycenter.Position /= points.Length;
         barycenter.Go = Instantiate(barrycenterPrefab, barycenter.Position, Quaternion.identity, container);
+        
+    }
+
+    public void GenerateCloudsPoints3D()
+    {
+        for (int i = 0; i < container3D.childCount; i++)
+        {
+            PointController pc;
+            if (container3D.GetChild(i).TryGetComponent(out pc))
+            {
+                pc.DestroyGO();
+            }
+        }
+        points = CloudPointsStatic.Create3DCloudPoints(100);
+        for (int i = 0; i < points.Length; i++)
+        {
+            points[i].Go = Instantiate(pointGo, points[i].Position, Quaternion.identity, container3D);
+            barycenter.Position += points[i].Position;
+        }
+
+        barycenter.Position /= points.Length;
+        barycenter.Go = Instantiate(barrycenterPrefab, barycenter.Position, Quaternion.identity, container3D);
         
     }
 

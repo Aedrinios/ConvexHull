@@ -8,6 +8,16 @@ namespace Statics
 {
     public static class GrahamScanStatic
     {
+        public static List<Point> Compute(List<Point> points, Point barryCenter)
+        {
+            for (int i = 0; i < points.Count; i++)
+            {
+                points[i].Angle = GrahamScanStatic.GetAngle(barryCenter.Position, points[i].Position);
+            }
+            points = points.OrderBy(x => x.Angle).ToList();
+            
+            return DeleteConcave(points);
+        }
         public static List<Point> SortPoints(List<Point> points, Point bc = null)
         {
             if (bc == null)
@@ -30,7 +40,6 @@ namespace Statics
 
             return points;
         }
-
         /// <summary>
         ///  returns true in the cases where the first angle is bigger than the second angle.
         /// In the cases where the angles are equal, or the first distance is less
@@ -95,33 +104,7 @@ namespace Statics
 
         public static List<Point> DeleteConcave(List<Point> points)
         {
-            // List<Point> L = points;
-            // Point S = points[0];
-            // Point pivot = S;
-            // bool go = true;
-            // do
-            // {
-            //     int index = L.FindIndex(a => a == pivot);
-            //
-            //     int previous = index - 1 < 0 ? L.Count - 1 : index - 1;
-            //     int next = index + 1 > L.Count - 1 ? 0 : index + 1;
-            //     float angle = Vector2.SignedAngle(L[next].Position - pivot.Position,
-            //         L[previous].Position - pivot.Position);
-            //     if (angle > 180 || angle < 0)
-            //     {
-            //         pivot = L[next];
-            //         go = true;
-            //     }
-            //     else
-            //     {
-            //         S = L[previous];
-            //         L.Remove(pivot);
-            //         pivot = S;
-            //         go = false;
-            //     }
-            // } while (pivot != S || !go);
-
-
+           
             LinkedList<Point> tmp = new LinkedList<Point>(points);
             int i = 0;
             LinkedListNode<Point> pInit = tmp.First;
@@ -148,36 +131,7 @@ namespace Statics
             } while ((pivot.Value.Position != pInit.Value.Position || go == false));
 
             points = new List<Point>(tmp);
-
-
-            // do
-            // {
-            //     
-            //     int prevIndex = i - 1 < 0 ? points.Count - 1 : i - 1;
-            //     int nextIndex = i + 1 >= points.Count - 1 ? 0 : i + 1;
-            //     Debug.Log("(" + prevIndex+", " + i + ", " + nextIndex+")" );
-            //     float f = GetAngle(points[i].Position, points[prevIndex].Position, points[nextIndex].Position) ;
-            //     if (f <= Mathf.PI )
-            //     {
-            //         pivot = points[nextIndex];
-            //         i = i + 1 >= points.Count - 1 ? 0 : i + 1;
-            //         go = true;
-            //     }
-            //     else
-            //     {
-            //         pInit = points[prevIndex];
-            //         points.Remove(points[i]);
-            //         //i = i - 1 < 0 ? points.Count - 1 : i - 1;
-            //         pivot = pInit;
-            //         
-            //         i = points.IndexOf(pivot);
-            //         Debug.Log("deleted : " + f);
-            //         go = false;
-            //     }
-            //
-            //
-            // } while ((pivot != pInit || go == false) );
-
+            
             return points;
         }
 

@@ -8,6 +8,7 @@ using Statics;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 using UnityEngine.UIElements;
+using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 
 public class DelaunayManager : MonoBehaviour
@@ -15,8 +16,8 @@ public class DelaunayManager : MonoBehaviour
     public LineRenderer lrPrefab;
     private CloudPointsManager cpm;
     private Point[] sortedPoints;
-    private List<Edge> edges;
-    private List<Triangle> triangles;
+    private List<Edge> edges = new List<Edge>();
+    private List<Triangle> triangles = new List<Triangle>();
 
     private void Awake()
     {
@@ -68,7 +69,6 @@ public class DelaunayManager : MonoBehaviour
 
         //2b - Avec le point Pk+1, on construit la triangulation initiale Tk+1 dont le bord est le polygone triangulaire POk+1 = [P1P2...Pk+1]
         int k = pointsPassed.Count;
-
         if (k >= 2)
         {
             Point kplus1 = sortedPoints[k + 1];
@@ -79,6 +79,11 @@ public class DelaunayManager : MonoBehaviour
 
             pointsPassed.Add(kplus1);
         }
+        else
+        {
+            Triangulate(sortedPoints[0], sortedPoints[1], sortedPoints[2]);
+            pointsPassed = new List<Point>() { sortedPoints[0], sortedPoints[1], sortedPoints[2] };
+        }
 
         //3 - A l'étape q, k+1<=q<n, on ajoute le point Pq+1 à la triangulation Tq afin d'obtenir la triangulation Tq+1
         // Le point Pq+1 n'appartenant pas au polygone POq, on va rechercher les arêtes de POq vues par Pq+1
@@ -86,33 +91,41 @@ public class DelaunayManager : MonoBehaviour
         //3a - On recherche les arêtes de Pq "vues" depuis Pq+1 : une arête A est vue de Pq+1 si et seulement si 
         //le point Pq+1 appartient à int(E_), E_ étant le demi-espace délimité par A et ne contenant pas Pq+1
         //Avec un produit scalaire, on relie les points si l'angle est aigu
-
-        Point pqplus1 = sortedPoints[pointsPassed.Count + 1];
-        List<Point> polygon = pointsPassed;
-        polygon = GrahamScanStatic.Compute(polygon);
-
-        for (int p = 0; p < polygon.Count; p++)
+        Point pqplus1 = new Point();
+        for (int i = pointsPassed.Count; i < sortedPoints.Length; i++)
         {
-            Vector3 segment = polygon[p + 1].Position - polygon[p].Position;
-            Vector3 normal = Vector3.Cross(segment.normalized, Vector3.forward);
-            //  Vector3 normal = Vector3.Cross(segment.normalized, -Vector3.forward);
-            Vector3 vectorToPoint = pqplus1.Position - polygon[p].Position;
-            float dotProduct = Vector3.Dot(normal.normalized, vectorToPoint);
-            if (dotProduct > 0)
+            pqplus1 = sortedPoints[i];
+            List<Point> polygon = new List<Point>();
+            polygon = GrahamScanStatic.Compute(pointsPassed);
+
+            for (int p = 0; p < polygon.Count; p++)
             {
-                pointsPassed.Add(pqplus1);
-                Triangulate(polygon[p], polygon[p + 1], pqplus1);
+                int indexNext = p + 1 < polygon.Count ? p + 1 : 0;
+                Vector3 segment = polygon[indexNext].Position - polygon[p].Position;
+                //Vector3 normal = Vector3.Cross(segment.normalized, Vector3.forward);
+                Vector3 normal = Vector3.Cross(segment.normalized, -Vector3.forward);
+                Vector3 vectorToPoint = pqplus1.Position - polygon[p].Position;
+                float dotProduct = Vector3.Dot(normal.normalized, vectorToPoint);
+                if (dotProduct > 0)
+                {
+                    pointsPassed.Add(pqplus1);
+                    Triangulate(polygon[p], polygon[indexNext], pqplus1);
+                }
             }
         }
+
 
         DisplayIncrementation();
     }
 
+
     private void DisplayIncrementation()
     {
-        foreach (Triangle t in triangles)
+        for (int i = 0; i < triangles.Count; i++)
         {
-            t.DisplayTriangle();
+            LineRenderer lr = Instantiate(lrPrefab, Vector3.zero, Quaternion.identity);
+            lr.positionCount = 4;
+            triangles[i].DisplayTriangle(ref lr);
         }
     }
 
@@ -124,6 +137,6 @@ public class DelaunayManager : MonoBehaviour
         if (!edges.Contains(edge1)) edges.Add(edge1);
         if (!edges.Contains(edge2)) edges.Add(edge2);
         if (!edges.Contains(edge3)) edges.Add(edge3);
-        triangles.Add(new Triangle(edge1, edge2, edge3));
+        triangles.Add(new Triangle(a, b, c));
     }
 }

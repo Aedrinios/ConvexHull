@@ -49,14 +49,14 @@ namespace Objects
                     }
                 }
             }
+
             return hasCommonPoint ? new Edge(p1, p2) : null;
         }
 
-        public void DisplayEdge(ref LineRenderer lr)
+        public void DisplayEdge(ref LineRenderer lr, int indexLr)
         {
-            lr.SetPosition(i, points[0].Position);
-            lr.SetPosition(points.Count, points[1].Position);
-
+            lr.SetPosition(indexLr, points[0].Position);
+            lr.SetPosition(indexLr + 1, points[1].Position);
         }
     }
 }

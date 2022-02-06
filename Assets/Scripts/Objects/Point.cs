@@ -24,6 +24,9 @@ namespace Objects
             this.Go = go;
             this.Position = pos;
         }
+
+        public float Angle { get; set; }
+
         public void ApplyMat(Material mat)
         {
             Renderer rend;

@@ -19,6 +19,8 @@ public class DelaunayManager : MonoBehaviour
     private List<Edge> edges = new List<Edge>();
     private List<Triangle> triangles = new List<Triangle>();
 
+    private bool drawTriangle = false;
+
     private void Awake()
     {
         if (!TryGetComponent(out cpm))
@@ -102,7 +104,6 @@ public class DelaunayManager : MonoBehaviour
             {
                 int indexNext = p + 1 < polygon.Count ? p + 1 : 0;
                 Vector3 segment = polygon[indexNext].Position - polygon[p].Position;
-                //Vector3 normal = Vector3.Cross(segment.normalized, Vector3.forward);
                 Vector3 normal = Vector3.Cross(segment.normalized, -Vector3.forward);
                 Vector3 vectorToPoint = pqplus1.Position - polygon[p].Position;
                 float dotProduct = Vector3.Dot(normal.normalized, vectorToPoint);
@@ -114,8 +115,29 @@ public class DelaunayManager : MonoBehaviour
             }
         }
 
-
         DisplayIncrementation();
+        drawTriangle = true;
+    }
+
+    void OnDrawGizmos()
+    {
+        Debug.Log("Draw Please");
+        if (triangles.Count > 0 && drawTriangle)
+        {
+            triangles[0].GetCircumcircleRay();
+            Gizmos.DrawSphere(triangles[0].Center, triangles[0].Ray);
+        }
+    }
+
+    private void FlippingEdges()
+    {
+        // List<Edge> edgesTriangulation = edges;
+        // while (edgesTriangulation.Count > 0)
+        // {
+        //     Edge A = edgesTriangulation[0];
+        //     edgesTriangulation.Remove(A);
+        //     if()
+        // }
     }
 
 
@@ -137,6 +159,6 @@ public class DelaunayManager : MonoBehaviour
         if (!edges.Contains(edge1)) edges.Add(edge1);
         if (!edges.Contains(edge2)) edges.Add(edge2);
         if (!edges.Contains(edge3)) edges.Add(edge3);
-        triangles.Add(new Triangle(a, b, c));
+        triangles.Add(new Triangle(edge1, edge2, edge3));
     }
 }

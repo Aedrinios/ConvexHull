@@ -8,6 +8,8 @@ namespace Objects
     public class Edge
     {
         private Point[] points = new Point[2];
+        public Point A => points[0];
+        public Point B => points[1];
 
         public Edge()
         {

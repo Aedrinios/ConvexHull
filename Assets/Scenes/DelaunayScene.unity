@@ -123,7 +123,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &77699320
+--- !u!1 &20541093
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -131,23 +131,23 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 77699321}
+  - component: {fileID: 20541094}
   m_Layer: 0
-  m_Name: DelaunayRenderer
+  m_Name: IncrementalRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &77699321
+--- !u!4 &20541094
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 77699320}
+  m_GameObject: {fileID: 20541093}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 2.6540766, y: 1.0214669, z: -16.261185}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -236,11 +236,49 @@ PrefabInstance:
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 8162208803157090954, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
+      propertyPath: flipContainer
+      value: 
+      objectReference: {fileID: 648076752}
+    - target: {fileID: 8162208803157090954, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
       propertyPath: delaunayContainer
       value: 
-      objectReference: {fileID: 77699321}
+      objectReference: {fileID: 0}
+    - target: {fileID: 8162208803157090954, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
+      propertyPath: incrementalContainer
+      value: 
+      objectReference: {fileID: 20541094}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
+--- !u!1 &648076751
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 648076752}
+  m_Layer: 0
+  m_Name: FlipRenderer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &648076752
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 648076751}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.6540766, y: 1.0214669, z: -16.261185}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &887080095
 GameObject:
   m_ObjectHideFlags: 0

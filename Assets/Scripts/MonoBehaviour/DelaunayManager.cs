@@ -13,13 +13,15 @@ using Vector3 = UnityEngine.Vector3;
 
 public class DelaunayManager : MonoBehaviour
 {
+    public Transform incrementalContainer;
+    public Transform flipContainer;
+
     public LineRenderer lrPrefab;
     private CloudPointsManager cpm;
     private Point[] sortedPoints;
     private List<Edge> edges = new List<Edge>();
-    private List<Triangle> triangles = new List<Triangle>();
-
-    private bool drawTriangle = false;
+    public List<Triangle> triangles = new List<Triangle>();
+    public List<Triangle> flippedTriangle = new List<Triangle>();
 
     private void Awake()
     {
@@ -115,39 +117,78 @@ public class DelaunayManager : MonoBehaviour
             }
         }
 
-        DisplayIncrementation();
-        drawTriangle = true;
+        DisplayIncrementation(triangles, Color.red, incrementalContainer);
     }
 
     void OnDrawGizmos()
     {
-        Debug.Log("Draw Please");
-        if (triangles.Count > 0 && drawTriangle)
+        if (triangles.Count > 0)
         {
-            triangles[0].GetCircumcircleRay();
-            Gizmos.DrawSphere(triangles[0].Center, triangles[0].Ray);
+            foreach (Triangle t in triangles)
+            {
+                List<Point> points = t.GetVertex();
+                Debug.Log("Display triangle 1 : " + points[0].Position + " / " +
+                          points[1].Position + " / " + points[2].Position);
+                t.CreateCircumcircle();
+                Gizmos.DrawWireSphere(t.Center, t.Ray);
+            }
         }
     }
 
-    private void FlippingEdges()
+    public void FlippingEdges()
     {
-        // List<Edge> edgesTriangulation = edges;
-        // while (edgesTriangulation.Count > 0)
-        // {
-        //     Edge A = edgesTriangulation[0];
-        //     edgesTriangulation.Remove(A);
-        //     if()
-        // }
+        Triangle[] tmp = new Triangle[triangles.Count];
+        triangles.CopyTo(tmp);
+        flippedTriangle = tmp.ToList();
+        List<Edge> Ac = edges;
+        Edge A = new Edge();
+        Edge A1 = new Edge();
+        Edge A2 = new Edge();
+        Edge A3 = new Edge();
+        Edge A4 = new Edge();
+        int T1 = 0;
+        int T2 = 0;
+        Point S1 = new Point();
+        Point S2 = new Point();
+        Point S3 = new Point();
+        Point S4 = new Point();
+        while (Ac.Count > 0)
+        {
+            A = Ac[0];
+            Ac.Remove(A);
+            (T1, T2) = A.BelongsToTriangles(flippedTriangle);
+            if (T1 >= 0 && T2 >= 0 && !flippedTriangle[T1].VerifyDelaunayCriteria(sortedPoints))
+            {
+                S1 = A.firstPoint;
+                S2 = A.secondPoint;
+                S4 = flippedTriangle[T1].GetLastVertex(A);
+                S3 = flippedTriangle[T2].GetLastVertex(A);
+                (A4, A1) = flippedTriangle[T1].GetOtherEdges(A);
+                (A3, A2) = flippedTriangle[T2].GetOtherEdges(A);
+                A = new Edge(S3, S4);
+                flippedTriangle[T1].Edges = new Edge[] { A, A1, A2.Reverse() };
+                flippedTriangle[T2].Edges = new Edge[] { A, A4.Reverse(), A3 };
+
+                Ac.Add(A1);
+                Ac.Add(A2);
+                Ac.Add(A3);
+                Ac.Add(A4);
+            }
+        }
+
+        DisplayIncrementation(flippedTriangle, Color.green, flipContainer);
     }
 
 
-    private void DisplayIncrementation()
+    private void DisplayIncrementation(List<Triangle> listTriangles, Color color, Transform container)
     {
-        for (int i = 0; i < triangles.Count; i++)
+        for (int i = 0; i < listTriangles.Count; i++)
         {
-            LineRenderer lr = Instantiate(lrPrefab, Vector3.zero, Quaternion.identity);
+            LineRenderer lr = Instantiate(lrPrefab, Vector3.zero, Quaternion.identity, container);
+            lr.startColor = color;
+            lr.endColor = color;
             lr.positionCount = 4;
-            triangles[i].DisplayTriangle(ref lr);
+            listTriangles[i].DisplayTriangle(ref lr);
         }
     }
 

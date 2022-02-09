@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
@@ -8,6 +9,13 @@ namespace Objects
     public class Triangle
     {
         private Edge[] edges = new Edge[3];
+
+        public Edge[] Edges
+        {
+            get { return edges; }
+            set { edges = value; }
+        }
+
         private Vector3 centerCircle;
         public Vector3 Center => centerCircle;
         private float rCircle;
@@ -38,10 +46,10 @@ namespace Objects
 
         public void DisplayTriangle(ref LineRenderer lr)
         {
-            lr.SetPosition(0, edges[0].A.Position);
-            lr.SetPosition(1, edges[1].A.Position);
-            lr.SetPosition(2, edges[2].A.Position);
-            lr.SetPosition(3, edges[0].A.Position);
+            lr.SetPosition(0, edges[0].firstPoint.Position);
+            lr.SetPosition(1, edges[1].firstPoint.Position);
+            lr.SetPosition(2, edges[2].firstPoint.Position);
+            lr.SetPosition(3, edges[0].firstPoint.Position);
         }
 
         public bool Contains(Edge edgeContained)
@@ -57,21 +65,51 @@ namespace Objects
             return false;
         }
 
-        public Point[] GetVertex()
+        public List<Point> GetVertex()
         {
-            return new Point[3] { edges[0].A, edges[1].A, edges[2].A };
+            return new List<Point> { edges[0].firstPoint, edges[1].firstPoint, edges[2].firstPoint };
         }
 
-        public Edge[] GetEdge()
+        public Point GetLastVertex(Edge edge)
         {
-            return edges;
+            Point a = edge.firstPoint;
+            Point b = edge.secondPoint;
+            List<Point> tmp = GetVertex();
+            tmp.Remove(a);
+            tmp.Remove(b);
+            return tmp[0];
         }
 
-        public void GetCircumcircleRay()
+        public Tuple<Edge, Edge> GetOtherEdges(Edge edge)
         {
-            Vector3 A = edges[0].A.Position;
-            Vector3 B = edges[0].B.Position;
-            Vector3 C = edges[1].B.Position;
+            Edge a = new Edge();
+            Edge b = new Edge();
+            foreach (Edge e in edges)
+            {
+                if (e.firstPoint == edge.secondPoint)
+                {
+                    a = e;
+                    break;
+                }
+            }
+
+            foreach (Edge e in edges)
+            {
+                if (e.secondPoint == edge.firstPoint)
+                {
+                    b = e;
+                    break;
+                }
+            }
+
+            return new Tuple<Edge, Edge>(a, b);
+        }
+
+        public void CreateCircumcircle()
+        {
+            Vector3 A = edges[0].firstPoint.Position;
+            Vector3 B = edges[0].secondPoint.Position;
+            Vector3 C = edges[1].secondPoint.Position;
 
             rCircle = ((A - B).magnitude * (B - C).magnitude * (C - A).magnitude) /
                       (2 * Vector3.Cross((A - B), (B - C)).magnitude);
@@ -84,6 +122,21 @@ namespace Objects
                           / (2 * Mathf.Pow(Vector3.Cross((A - B), (B - C)).magnitude, 2));
 
             centerCircle = alpha * A + beta * B + gamma * C;
+        }
+
+        public bool VerifyDelaunayCriteria(Point[] pointsTriangulation)
+        {
+            CreateCircumcircle();
+            List<Point> trianglePoint = GetVertex();
+            foreach (Point p in pointsTriangulation)
+            {
+                if ((p.Position - centerCircle).magnitude < rCircle && !trianglePoint.Contains(p))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

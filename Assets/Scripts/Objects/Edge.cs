@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Objects;
@@ -8,8 +9,8 @@ namespace Objects
     public class Edge
     {
         private Point[] points = new Point[2];
-        public Point A => points[0];
-        public Point B => points[1];
+        public Point firstPoint => points[0];
+        public Point secondPoint => points[1];
 
         public Edge()
         {
@@ -55,10 +56,48 @@ namespace Objects
             return hasCommonPoint ? new Edge(p1, p2) : null;
         }
 
+        public Tuple<int, int> BelongsToTriangles(List<Triangle> triangles)
+        {
+            int foundTriangle = 0;
+            int[] index = new int[2] { -1, -1 };
+            
+
+            for (int i = 0; i < triangles.Count; i++)
+            {
+                if (triangles[i].Contains(this))
+                {
+                    index[foundTriangle] = i;
+                    foundTriangle++;
+                }
+
+                if (foundTriangle >= 2)
+                    break;
+            }
+
+            return new Tuple<int, int>(index[0], index[1]);
+        }
+
         public void DisplayEdge(ref LineRenderer lr, int indexLr)
         {
             lr.SetPosition(indexLr, points[0].Position);
             lr.SetPosition(indexLr + 1, points[1].Position);
+        }
+
+        public static bool operator ==(Edge a, Edge b)
+        {
+            return (a.firstPoint == b.firstPoint && a.secondPoint == b.secondPoint) ||
+                   (a.firstPoint == b.secondPoint && a.secondPoint == b.firstPoint);
+        }
+
+
+        public static bool operator !=(Edge a, Edge b)
+        {
+            return !(a == b);
+        }
+
+        public Edge Reverse()
+        {
+            return new Edge(this.secondPoint, this.firstPoint);
         }
     }
 }

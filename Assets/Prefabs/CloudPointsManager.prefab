@@ -79,7 +79,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdd67a8e92c2aa940825e0a976955a72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  amountOfPoints: 50
   pointGo: {fileID: 8233327308343019187, guid: 239d981f6333ae84bab4d2c2a62075c2, type: 3}
   barrycenterPrefab: {fileID: 8233327308343019187, guid: b893a6ab7c371884cb24da9c4f190c9e, type: 3}
   container: {fileID: 235797972}
@@ -215,6 +214,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29f123ee937875c4fbf1fda3f33cac1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  incrementalContainer: {fileID: 0}
+  flipContainer: {fileID: 0}
   lrPrefab: {fileID: 3944628159002743970, guid: d28e8d7afe4b950458b4dc5f7d13c066, type: 3}
 --- !u!1001 &3830216762620280121
 PrefabInstance:
@@ -227,14 +228,14 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 8162208803157090954}
-    - target: {fileID: 5059229363007932299, guid: 0fbe917e557d10049a34c01bd0ef7219, type: 3}
+    - target: {fileID: 5012433758069026836, guid: 0fbe917e557d10049a34c01bd0ef7219, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 8162208803157090954}
     - target: {fileID: 5059229363007932299, guid: 0fbe917e557d10049a34c01bd0ef7219, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: IntersectTest
-      objectReference: {fileID: 0}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 8162208803157090954}
     - target: {fileID: 6563380795044021552, guid: 0fbe917e557d10049a34c01bd0ef7219, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -338,7 +339,7 @@ PrefabInstance:
     - target: {fileID: 6563380796759110478, guid: 0fbe917e557d10049a34c01bd0ef7219, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1944835246339136039}
+      objectReference: {fileID: 477154881}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0fbe917e557d10049a34c01bd0ef7219, type: 3}
 --- !u!224 &7940543049321560073 stripped

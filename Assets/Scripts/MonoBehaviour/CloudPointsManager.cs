@@ -62,7 +62,7 @@ public class CloudPointsManager : MonoBehaviour
                 frameCounter++;
         }
 
-        Debug.DrawLine(barycenter.Position, currentPoint.Position,Color.green);
+       // Debug.DrawLine(barycenter.Position, currentPoint.Position,Color.green);
     }
 
     public void GenerateCloudsPoints()
@@ -75,7 +75,7 @@ public class CloudPointsManager : MonoBehaviour
                 pc.DestroyGO();
             }
         }
-        points = CloudPointsStatic.Create2DCloudPoints(20);
+        points = CloudPointsStatic.Create2DCloudPoints(8);
         for (int i = 0; i < points.Length; i++)
         {
             points[i].Go = Instantiate(pointGo, points[i].Position, Quaternion.identity, container);
@@ -83,7 +83,7 @@ public class CloudPointsManager : MonoBehaviour
         }
 
         barycenter.Position /= points.Length;
-        barycenter.Go = Instantiate(barrycenterPrefab, barycenter.Position, Quaternion.identity, container);
+     //   barycenter.Go = Instantiate(barrycenterPrefab, barycenter.Position, Quaternion.identity, container);
         
     }
 

@@ -38,17 +38,17 @@ public class DelaunayManager : MonoBehaviour
 
     public void DelaunayStart()
     {
-        IncrementalTriangulation(cpm.GetPoints());
+        IncrementalTriangulation(GenerateByClick.points);
     }
 
-    public void IncrementalTriangulation(Point[] points)
+    public void IncrementalTriangulation(List<Point> points)
     {
         if (points == null) return;
-        if (points.Length <= 0) return;
+        if (points.Count <= 0) return;
 
         //1 - Les points sont triés par abscisse croissante
-        sortedPoints = new Point[points.Length];
-        for (int i = 0; i < points.Length; i++)
+        sortedPoints = new Point[points.Count];
+        for (int i = 0; i < points.Count; i++)
         {
             sortedPoints[i] = points[i];
         }
@@ -126,9 +126,6 @@ public class DelaunayManager : MonoBehaviour
         {
             foreach (Triangle t in triangles)
             {
-                List<Point> points = t.GetVertex();
-                Debug.Log("Display triangle 1 : " + points[0].Position + " / " +
-                          points[1].Position + " / " + points[2].Position);
                 t.CreateCircumcircle();
                 Gizmos.DrawWireSphere(t.Center, t.Ray);
             }
@@ -137,9 +134,7 @@ public class DelaunayManager : MonoBehaviour
 
     public void FlippingEdges()
     {
-        Triangle[] tmp = new Triangle[triangles.Count];
-        triangles.CopyTo(tmp);
-        flippedTriangle = tmp.ToList();
+        flippedTriangle = triangles;
         List<Edge> Ac = edges;
         Edge A = new Edge();
         Edge A1 = new Edge();
@@ -152,22 +147,25 @@ public class DelaunayManager : MonoBehaviour
         Point S2 = new Point();
         Point S3 = new Point();
         Point S4 = new Point();
+        bool testTriangle = true;
         while (Ac.Count > 0)
         {
             A = Ac[0];
             Ac.Remove(A);
-            (T1, T2) = A.BelongsToTriangles(flippedTriangle);
-            if (T1 >= 0 && T2 >= 0 && !flippedTriangle[T1].VerifyDelaunayCriteria(sortedPoints))
+            (T1, T2) = A.BelongsToTriangles(triangles);
+            if (T1 >= 0 && T2 >= 0 && !triangles[T1].VerifyDelaunayCriteria(sortedPoints))
             {
                 S1 = A.firstPoint;
                 S2 = A.secondPoint;
-                S4 = flippedTriangle[T1].GetLastVertex(A);
-                S3 = flippedTriangle[T2].GetLastVertex(A);
-                (A4, A1) = flippedTriangle[T1].GetOtherEdges(A);
-                (A3, A2) = flippedTriangle[T2].GetOtherEdges(A);
+                S4 = triangles[T1].GetLastVertex(A);
+                S3 = triangles[T2].GetLastVertex(A);
+
+                (A4, A1) = triangles[T1].GetOtherEdges(A);
+                (A3, A2) = triangles[T2].GetOtherEdges(A);
+
                 A = new Edge(S3, S4);
-                flippedTriangle[T1].Edges = new Edge[] { A, A1, A2.Reverse() };
-                flippedTriangle[T2].Edges = new Edge[] { A, A4.Reverse(), A3 };
+                triangles[T1].SetEdges(A, A1, A2);
+                triangles[T2].SetEdges(A, A4, A3);
 
                 Ac.Add(A1);
                 Ac.Add(A2);
@@ -175,8 +173,7 @@ public class DelaunayManager : MonoBehaviour
                 Ac.Add(A4);
             }
         }
-
-        DisplayIncrementation(flippedTriangle, Color.green, flipContainer);
+        DisplayIncrementation(triangles, Color.green, flipContainer);
     }
 
 
@@ -187,7 +184,7 @@ public class DelaunayManager : MonoBehaviour
             LineRenderer lr = Instantiate(lrPrefab, Vector3.zero, Quaternion.identity, container);
             lr.startColor = color;
             lr.endColor = color;
-            lr.positionCount = 4;
+            lr.positionCount = 3;
             listTriangles[i].DisplayTriangle(ref lr);
         }
     }
@@ -201,5 +198,17 @@ public class DelaunayManager : MonoBehaviour
         if (!edges.Contains(edge2)) edges.Add(edge2);
         if (!edges.Contains(edge3)) edges.Add(edge3);
         triangles.Add(new Triangle(edge1, edge2, edge3));
+    }
+
+    private void DebugTriangle(List<Triangle> trianglesToTest)
+    {
+        foreach (Triangle t in trianglesToTest)
+        {
+            foreach (Edge e in t.Edges)
+            {
+                Debug.Log("first edge pos : " + e.firstPoint.Position);
+                Debug.Log("second edge pos : " + e.secondPoint.Position);
+            }
+        }
     }
 }

@@ -60,7 +60,6 @@ namespace Objects
         {
             int foundTriangle = 0;
             int[] index = new int[2] { -1, -1 };
-            
 
             for (int i = 0; i < triangles.Count; i++)
             {

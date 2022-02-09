@@ -49,7 +49,6 @@ namespace Objects
             lr.SetPosition(0, edges[0].firstPoint.Position);
             lr.SetPosition(1, edges[1].firstPoint.Position);
             lr.SetPosition(2, edges[2].firstPoint.Position);
-            lr.SetPosition(3, edges[0].firstPoint.Position);
         }
 
         public bool Contains(Edge edgeContained)
@@ -65,44 +64,54 @@ namespace Objects
             return false;
         }
 
-        public List<Point> GetVertex()
+        public List<Vector3> GetVertex()
         {
-            return new List<Point> { edges[0].firstPoint, edges[1].firstPoint, edges[2].firstPoint };
+            return new List<Vector3>
+            {
+                new Vector3(edges[0].firstPoint.Position.x, edges[0].firstPoint.Position.y,
+                    edges[0].firstPoint.Position.z),
+                new Vector3(edges[1].firstPoint.Position.x, edges[1].firstPoint.Position.y,
+                    edges[1].firstPoint.Position.z),
+                new Vector3(edges[2].firstPoint.Position.x, edges[2].firstPoint.Position.y,
+                    edges[2].firstPoint.Position.z)
+            };
         }
 
         public Point GetLastVertex(Edge edge)
         {
-            Point a = edge.firstPoint;
-            Point b = edge.secondPoint;
-            List<Point> tmp = GetVertex();
+            Vector3 a = new Vector3(edge.firstPoint.Position.x, edge.firstPoint.Position.y, edge.firstPoint.Position.z);
+            Vector3 b = new Vector3(edge.secondPoint.Position.x, edge.secondPoint.Position.y,
+                edge.secondPoint.Position.z);
+            List<Vector3> tmp = GetVertex();
             tmp.Remove(a);
             tmp.Remove(b);
-            return tmp[0];
+            return new Point(tmp[0]);
         }
 
-        public Tuple<Edge, Edge> GetOtherEdges(Edge edge)
+        public Tuple<Edge, Edge> GetOtherEdges(Edge a)
         {
-            Edge a = new Edge();
-            Edge b = new Edge();
+            Edge firstEdge = new Edge();
+            Edge secondEdge = new Edge();
             foreach (Edge e in edges)
             {
-                if (e.firstPoint == edge.secondPoint)
-                {
-                    a = e;
-                    break;
-                }
+                if ((e.firstPoint.Position == a.secondPoint.Position ||
+                     e.secondPoint.Position == a.secondPoint.Position) && e != a)
+                    firstEdge = e;
+
+
+                if ((e.firstPoint.Position == a.firstPoint.Position ||
+                     e.secondPoint.Position == a.firstPoint.Position) && e != a)
+                    secondEdge = e;
             }
 
-            foreach (Edge e in edges)
+            if (firstEdge.firstPoint.Position == Vector3.zero || secondEdge.firstPoint.Position == Vector3.zero ||
+                firstEdge.secondPoint.Position == Vector3.zero || secondEdge.secondPoint.Position == Vector3.zero)
             {
-                if (e.secondPoint == edge.firstPoint)
-                {
-                    b = e;
-                    break;
-                }
+                Debug.Log("WOAH");
             }
 
-            return new Tuple<Edge, Edge>(a, b);
+
+            return new Tuple<Edge, Edge>(firstEdge, secondEdge);
         }
 
         public void CreateCircumcircle()
@@ -127,16 +136,38 @@ namespace Objects
         public bool VerifyDelaunayCriteria(Point[] pointsTriangulation)
         {
             CreateCircumcircle();
-            List<Point> trianglePoint = GetVertex();
+            List<Vector3> trianglePoint = GetVertex();
             foreach (Point p in pointsTriangulation)
             {
-                if ((p.Position - centerCircle).magnitude < rCircle && !trianglePoint.Contains(p))
+                if ((p.Position - centerCircle).magnitude < rCircle && !trianglePoint.Contains(p.Position))
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        public void SetEdges(Edge a, Edge a1, Edge a2)
+        {
+            edges[0] = a;
+            if (a.secondPoint.Position == a1.firstPoint.Position)
+            {
+                edges[1] = a1;
+            }
+            else if (a.secondPoint.Position == a1.secondPoint.Position)
+            {
+                edges[1] = a1.Reverse();
+            }
+
+            if (a.firstPoint.Position == a2.secondPoint.Position)
+            {
+                edges[2] = a2;
+            }
+            else if (a.firstPoint.Position == a2.firstPoint.Position)
+            {
+                edges[2] = a2.Reverse();
+            }
         }
     }
 }

@@ -134,6 +134,7 @@ public class DelaunayManager : MonoBehaviour
 
     public void FlippingEdges()
     {
+        int count = 0;
         flippedTriangle = triangles;
         List<Edge> Ac = edges;
         Edge A = new Edge();
@@ -148,31 +149,31 @@ public class DelaunayManager : MonoBehaviour
         Point S3 = new Point();
         Point S4 = new Point();
         bool testTriangle = true;
-        while (Ac.Count > 0)
+        while (Ac.Count > 0 && count < 1000)
         {
             A = Ac[0];
             Ac.Remove(A);
             (T1, T2) = A.BelongsToTriangles(triangles);
-            if (T1 >= 0 && T2 >= 0 && !triangles[T1].VerifyDelaunayCriteria(sortedPoints))
+            if (T1 >= 0 && T2 >= 0 && !triangles[T1].VerifyDelaunayCriteria(triangles[T2].GetVertex()))
             {
-                S1 = A.firstPoint;
-                S2 = A.secondPoint;
-                S4 = triangles[T1].GetLastVertex(A);
-                S3 = triangles[T2].GetLastVertex(A);
+                S3 = triangles[T1].GetLastVertex(A);
+                S4 = triangles[T2].GetLastVertex(A);
 
                 (A4, A1) = triangles[T1].GetOtherEdges(A);
                 (A3, A2) = triangles[T2].GetOtherEdges(A);
 
                 A = new Edge(S3, S4);
                 triangles[T1].SetEdges(A, A1, A2);
-                triangles[T2].SetEdges(A, A4, A3);
+                triangles[T2].SetEdges(A, A3, A4);
 
                 Ac.Add(A1);
                 Ac.Add(A2);
                 Ac.Add(A3);
                 Ac.Add(A4);
             }
+            count++;
         }
+
         DisplayIncrementation(triangles, Color.green, flipContainer);
     }
 

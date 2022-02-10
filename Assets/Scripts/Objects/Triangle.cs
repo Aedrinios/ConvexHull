@@ -103,14 +103,6 @@ namespace Objects
                      e.secondPoint.Position == a.firstPoint.Position) && e != a)
                     secondEdge = e;
             }
-
-            if (firstEdge.firstPoint.Position == Vector3.zero || secondEdge.firstPoint.Position == Vector3.zero ||
-                firstEdge.secondPoint.Position == Vector3.zero || secondEdge.secondPoint.Position == Vector3.zero)
-            {
-                Debug.Log("WOAH");
-            }
-
-
             return new Tuple<Edge, Edge>(firstEdge, secondEdge);
         }
 
@@ -133,13 +125,13 @@ namespace Objects
             centerCircle = alpha * A + beta * B + gamma * C;
         }
 
-        public bool VerifyDelaunayCriteria(Point[] pointsTriangulation)
+        public bool VerifyDelaunayCriteria(List<Vector3> pointsTriangulation)
         {
             CreateCircumcircle();
             List<Vector3> trianglePoint = GetVertex();
-            foreach (Point p in pointsTriangulation)
+            foreach (Vector3 p in pointsTriangulation)
             {
-                if ((p.Position - centerCircle).magnitude < rCircle && !trianglePoint.Contains(p.Position))
+                if ((p - centerCircle).magnitude < rCircle && !trianglePoint.Contains(p))
                 {
                     return false;
                 }
@@ -159,7 +151,25 @@ namespace Objects
             {
                 edges[1] = a1.Reverse();
             }
-
+            
+            if (a.firstPoint.Position == a1.secondPoint.Position)
+            {
+                edges[2] = a1;
+            }
+            else if (a.firstPoint.Position == a1.firstPoint.Position)
+            {
+                edges[2] = a1.Reverse();
+            }
+            
+            if (a.secondPoint.Position == a2.firstPoint.Position)
+            {
+                edges[1] = a2;
+            }
+            else if (a.secondPoint.Position == a2.secondPoint.Position)
+            {
+                edges[1] = a2.Reverse();
+            }
+            
             if (a.firstPoint.Position == a2.secondPoint.Position)
             {
                 edges[2] = a2;

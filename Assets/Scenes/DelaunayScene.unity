@@ -280,9 +280,29 @@ PrefabInstance:
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 8162208803157090954, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
+      propertyPath: autoSpeed
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8162208803157090954, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
+      propertyPath: debugAuto
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8162208803157090954, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
+      propertyPath: lrEdgePrefab
+      value: 
+      objectReference: {fileID: 3944628159002743970, guid: 53215d8eed6d73348a1270cb17d2ccbe, type: 3}
+    - target: {fileID: 8162208803157090954, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
+      propertyPath: lrFlipPrefab
+      value: 
+      objectReference: {fileID: 3944628159002743970, guid: fca88c84de5020a418d51940713dbfb2, type: 3}
+    - target: {fileID: 8162208803157090954, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
       propertyPath: flipContainer
       value: 
       objectReference: {fileID: 648076752}
+    - target: {fileID: 8162208803157090954, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
+      propertyPath: debugRendering
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8162208803157090954, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
       propertyPath: delaunayContainer
       value: 

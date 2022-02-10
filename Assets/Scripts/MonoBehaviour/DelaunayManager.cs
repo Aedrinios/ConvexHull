@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Newtonsoft.Json.Serialization;
 using Objects;
 using Statics;
 using UnityEngine;
@@ -17,12 +18,25 @@ public class DelaunayManager : MonoBehaviour
     public Transform flipContainer;
 
     public LineRenderer lrPrefab;
+    public LineRenderer lrFlipPrefab;
+    public LineRenderer lrEdgePrefab;
     private CloudPointsManager cpm;
-    private Point[] sortedPoints;
-    private List<Edge> edges = new List<Edge>();
+    public Point[] sortedPoints;
+    public List<Edge> edges = new List<Edge>();
     public List<Triangle> triangles = new List<Triangle>();
     public List<Triangle> flippedTriangle = new List<Triangle>();
+    private LineRenderer t1LR;
+    private LineRenderer t2LR;
+    private LineRenderer edgeLR;
 
+    private List<LineRenderer> triangleLineRenderers = new List<LineRenderer>();
+    
+    public bool debugRendering = false;
+    public bool debugAuto = false;
+    public float autoSpeed = 0.2f;
+    
+    private bool triangulating = false;
+    
     private void Awake()
     {
         if (!TryGetComponent(out cpm))
@@ -40,21 +54,31 @@ public class DelaunayManager : MonoBehaviour
     {
         IncrementalTriangulation(GenerateByClick.points);
     }
-
+    public void FlipStart()
+    {
+        if (debugRendering)
+        {
+            if (!triangulating)
+            {
+                incrementalContainer.gameObject.SetActive(false);
+                triangulating = true;
+                for (int i = 0; i < triangles.Count; i++)
+                {
+                    triangleLineRenderers.Add(Instantiate(lrPrefab, Vector3.zero, Quaternion.identity, flipContainer));
+                }
+                StartCoroutine(FlippingEdgesStepByStep());
+            }
+        }
+        else { FlippingEdges(); }
+    }
     public void IncrementalTriangulation(List<Point> points)
     {
         if (points == null) return;
         if (points.Count <= 0) return;
 
         //1 - Les points sont triés par abscisse croissante
-        sortedPoints = new Point[points.Count];
-        for (int i = 0; i < points.Count; i++)
-        {
-            sortedPoints[i] = points[i];
-        }
-
-        Array.Sort(sortedPoints);
-
+        sortedPoints = sortPoints(points);
+        
         //2 - On initialise le processus en calculant une 2-triangulation initiale
         //2a -On construit une suite de k - 1 arêtes colinéaires [P1,P2],..., [Pk-1, Pk] avec les k(>=2) points alignés
         float initialX = sortedPoints[0].Position.x;
@@ -117,7 +141,18 @@ public class DelaunayManager : MonoBehaviour
             }
         }
 
-        DisplayIncrementation(triangles, Color.red, incrementalContainer);
+        DisplayIncrementation(triangles, new Color(0.3f,0.3f,0.3f), incrementalContainer);
+    }
+
+    private Point[] sortPoints(List<Point> points)
+    {
+        Point[] list = new Point[points.Count];
+        for (int i = 0; i < points.Count; i++)
+        {
+            list[i] = points[i];
+        }
+        Array.Sort(list);
+        return list;
     }
 
     void OnDrawGizmos()
@@ -132,7 +167,7 @@ public class DelaunayManager : MonoBehaviour
         }
     }
 
-    public void FlippingEdges()
+    private void FlippingEdges()
     {
         int count = 0;
         flippedTriangle = triangles;
@@ -144,8 +179,6 @@ public class DelaunayManager : MonoBehaviour
         Edge A4 = new Edge();
         int T1 = 0;
         int T2 = 0;
-        Point S1 = new Point();
-        Point S2 = new Point();
         Point S3 = new Point();
         Point S4 = new Point();
         bool testTriangle = true;
@@ -173,11 +206,113 @@ public class DelaunayManager : MonoBehaviour
             }
             count++;
         }
-
-        DisplayIncrementation(triangles, Color.green, flipContainer);
+        DisplayIncrementation(triangles, new Color(0f,1f,0f), flipContainer);
     }
 
+    
+    public IEnumerator FlippingEdgesStepByStep()
+    {
+        WaitForSeconds wait = new WaitForSeconds(autoSpeed);
+        WaitUntil waitKey = new WaitUntil(() => Input.GetKeyDown(KeyCode.A));
+        int count = 0;
+        flippedTriangle = triangles;
+        List<Edge> Ac = edges;
+        Edge A = new Edge();
+        Edge A1 = new Edge();
+        Edge A2 = new Edge();
+        Edge A3 = new Edge();
+        Edge A4 = new Edge();
+        int T1 = 0;
+        int T2 = 0;
+        Point S1 = new Point();
+        Point S2 = new Point();
+        Point S3 = new Point();
+        Point S4 = new Point();
+        
+        while (Ac.Count > 0 && count < 1000)
+        {
+            A = Ac[0];
+            Ac.Remove(A);
+            (T1, T2) = A.BelongsToTriangles(triangles);
+            bool flipped = false;
+            if (T1 >= 0 && T2 >= 0)
+            {
+                //DisplayFlip(triangles[T1], triangles[T2], A, Color.blue);
+                //DebugDisplayIncrementation(triangles, new Color(0.3f,0.3f,0.3f));
+                if(!debugAuto) yield return waitKey;
+                if ( !triangles[T1].VerifyDelaunayCriteria(triangles[T2].GetVertex()))
+                {
+                    S3 = triangles[T1].GetLastVertex(A);
+                    S4 = triangles[T2].GetLastVertex(A);
 
+                    (A4, A1) = triangles[T1].GetOtherEdges(A);
+                    (A3, A2) = triangles[T2].GetOtherEdges(A);
+
+                    A = new Edge(S3, S4);
+                    triangles[T1].SetEdges(A, A1, A2);
+                    triangles[T2].SetEdges(A, A3, A4);
+
+                    Ac.Add(A1);
+                    Ac.Add(A2);
+                    Ac.Add(A3);
+                    Ac.Add(A4);
+                    flipped = true;
+                }
+
+                Color col = flipped ? Color.red : Color.green;
+                DisplayFlip(triangles[T1], triangles[T2], A, col);
+                DebugDisplayIncrementation(triangles, new Color(0.3f,0.3f,0.3f));
+
+                if (debugAuto) yield return wait;
+                else yield return waitKey;
+            }
+            count++;
+        }
+
+        DisplayIncrementation(triangles, new Color(0f,1f,0f), flipContainer);
+        ClearFlipDisplay();
+        triangulating = false;
+    }
+
+    private void ClearFlipDisplay()
+    {
+        Destroy(t1LR);
+        Destroy(t2LR);
+        Destroy(edgeLR);
+    }
+    
+    private void DisplayFlip(Triangle T1, Triangle T2, Edge A, Color color)
+    {
+        if (t1LR == null)t1LR = Instantiate(lrFlipPrefab, Vector3.zero, Quaternion.identity);
+        if (t2LR == null)t2LR = Instantiate(lrFlipPrefab, Vector3.zero, Quaternion.identity);
+        if (edgeLR == null)edgeLR = Instantiate(lrEdgePrefab, Vector3.zero, Quaternion.identity);
+        t1LR.positionCount = 3;
+        t1LR.SetPosition(0,T1.Edges[0].firstPoint.Position);
+        t1LR.SetPosition(1,T1.Edges[1].firstPoint.Position);
+        t1LR.SetPosition(2,T1.Edges[2].firstPoint.Position);
+        t2LR.positionCount = 3;
+        t2LR.SetPosition(0,T2.Edges[0].firstPoint.Position);
+        t2LR.SetPosition(1,T2.Edges[1].firstPoint.Position);
+        t2LR.SetPosition(2,T2.Edges[2].firstPoint.Position);
+        edgeLR.positionCount = 2;
+        edgeLR.startColor = color;
+        edgeLR.endColor = color;
+        Debug.Log("Edge A : " + A.firstPoint.Position + " , " + A.secondPoint.Position);
+        edgeLR.SetPosition(0,A.firstPoint.Position);
+        edgeLR.SetPosition(1,A.secondPoint.Position);
+    }
+    private void DebugDisplayIncrementation(List<Triangle> listTriangles, Color color)
+    {
+        
+        for (int i = 0; i < listTriangles.Count; i++)
+        {
+            LineRenderer lr = triangleLineRenderers[i];//Instantiate(lrPrefab, Vector3.zero, Quaternion.identity, flipContainer);
+            lr.startColor = color;
+            lr.endColor = color;
+            lr.positionCount = 3;
+            listTriangles[i].DisplayTriangle(ref lr);
+        }
+    }
     private void DisplayIncrementation(List<Triangle> listTriangles, Color color, Transform container)
     {
         for (int i = 0; i < listTriangles.Count; i++)

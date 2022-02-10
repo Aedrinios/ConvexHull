@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3944628159002743971}
   - component: {fileID: 3944628159002743970}
   m_Layer: 0
-  m_Name: DelaunayLineRenderer
+  m_Name: FlipLineRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -70,11 +70,11 @@ LineRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 50
   m_Positions: []
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.1
+    widthMultiplier: 0.3
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -92,8 +92,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 0.8820387, b: 0, a: 1}
-      key1: {r: 1, g: 0.8820387, b: 0, a: 1}
+      key0: {r: 0.9528302, g: 0.89274514, b: 0.1033731, a: 1}
+      key1: {r: 0.9528302, g: 0.89274514, b: 0.1033731, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}

@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 477154880}
   - component: {fileID: 477154881}
   - component: {fileID: 8162208803157090954}
+  - component: {fileID: 4000064625772353275}
   m_Layer: 0
   m_Name: CloudPointsManager
   m_TagString: Untagged
@@ -217,6 +218,26 @@ MonoBehaviour:
   incrementalContainer: {fileID: 0}
   flipContainer: {fileID: 0}
   lrPrefab: {fileID: 3944628159002743970, guid: d28e8d7afe4b950458b4dc5f7d13c066, type: 3}
+  lrFlipPrefab: {fileID: 0}
+  lrEdgePrefab: {fileID: 0}
+  debugRendering: 0
+  debugAuto: 0
+  autoSpeed: 0.2
+--- !u!114 &4000064625772353275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1944835246339136039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d6cf8cff8e244e08c126870d221c7ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  delaunayManager: {fileID: 8162208803157090954}
+  barryPrefab: {fileID: 0}
+  lrFlipPrefab: {fileID: 3944628159002743970, guid: fca88c84de5020a418d51940713dbfb2, type: 3}
 --- !u!1001 &3830216762620280121
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -232,6 +253,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 8162208803157090954}
+    - target: {fileID: 5012433758069026836, guid: 0fbe917e557d10049a34c01bd0ef7219, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: FlipStart
+      objectReference: {fileID: 0}
     - target: {fileID: 5059229363007932299, guid: 0fbe917e557d10049a34c01bd0ef7219, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -340,6 +365,18 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 477154881}
+    - target: {fileID: 7175621066913666805, guid: 0fbe917e557d10049a34c01bd0ef7219, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 4000064625772353275}
+    - target: {fileID: 7175621066913666805, guid: 0fbe917e557d10049a34c01bd0ef7219, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: VoronoiStart
+      objectReference: {fileID: 0}
+    - target: {fileID: 7175621066913666805, guid: 0fbe917e557d10049a34c01bd0ef7219, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: VoronoiManager, Assembly-CSharp
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0fbe917e557d10049a34c01bd0ef7219, type: 3}
 --- !u!224 &7940543049321560073 stripped

@@ -215,6 +215,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 477154881, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
+      propertyPath: lrPrefab
+      value: 
+      objectReference: {fileID: 3944628159002743970, guid: de93cd3e3eb69a84a958a2989cf5be0e, type: 3}
     - target: {fileID: 1944835246339136039, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
       propertyPath: m_Name
       value: CloudPointsManager
@@ -269,7 +273,7 @@ PrefabInstance:
       objectReference: {fileID: 345427015}
     - target: {fileID: 7940543050232106615, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: compute
+      value: computeWithDelaunay
       objectReference: {fileID: 0}
     - target: {fileID: 7940543050232106615, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -303,6 +307,10 @@ PrefabInstance:
       propertyPath: debugRendering
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8162208803157090954, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
+      propertyPath: updateContainer
+      value: 
+      objectReference: {fileID: 1909448034}
     - target: {fileID: 8162208803157090954, guid: 738a2e2d7f8f9c44e928c2a2bf126141, type: 3}
       propertyPath: delaunayContainer
       value: 
@@ -518,4 +526,34 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1909448033
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1909448034}
+  m_Layer: 0
+  m_Name: UpdateContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1909448034
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909448033}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

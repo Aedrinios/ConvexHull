@@ -34,7 +34,7 @@ public class VoronoiManager : MonoBehaviour
     private void InitializeVoronoi()
     {
         Debug.Log("Voronoi : init");
-        triangles = delaunayManager.triangles;
+        triangles = delaunayManager.Triangles;
         ExtractEdgesFromTriangles();
         Debug.Log("Voronoi : triangles size : " + triangles.Count);
         Debug.Log("Voronoi : edges size : " + edges.Count);
@@ -72,7 +72,7 @@ public class VoronoiManager : MonoBehaviour
 
     private void GetCells()
     {
-        foreach (var point in delaunayManager.sortedPoints)
+        foreach (var point in delaunayManager.SortedPoints)
         {
             List<Edge> cellEdges = new List<Edge>();
             for (int i = 0; i < edges.Count; i++)

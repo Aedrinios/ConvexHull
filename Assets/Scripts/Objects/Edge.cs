@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Objects
 {
+    [Serializable]
     public class Edge
     {
         private Point[] points = new Point[2];

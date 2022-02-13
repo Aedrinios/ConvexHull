@@ -30,9 +30,7 @@ namespace Objects
 
         public Triangle(Edge a, Edge b, Edge c)
         {
-            edges[0] = a;
-            edges[1] = b;
-            edges[2] = c;
+            SetEdges(a, b, c);
         }
 
         public Triangle(List<Edge> newPoints)
@@ -103,6 +101,7 @@ namespace Objects
                      e.secondPoint.Position == a.firstPoint.Position) && e != a)
                     secondEdge = e;
             }
+
             return new Tuple<Edge, Edge>(firstEdge, secondEdge);
         }
 
@@ -125,17 +124,15 @@ namespace Objects
             centerCircle = alpha * A + beta * B + gamma * C;
         }
 
-        public bool VerifyDelaunayCriteria(List<Vector3> pointsTriangulation)
+        public bool VerifyDelaunayCriteria(Vector3 pointTriangulation)
         {
             CreateCircumcircle();
             List<Vector3> trianglePoint = GetVertex();
-            foreach (Vector3 p in pointsTriangulation)
+            if ((pointTriangulation - centerCircle).magnitude < rCircle)
             {
-                if ((p - centerCircle).magnitude < rCircle && !trianglePoint.Contains(p))
-                {
-                    return false;
-                }
+                return false;
             }
+
 
             return true;
         }
@@ -151,7 +148,7 @@ namespace Objects
             {
                 edges[1] = a1.Reverse();
             }
-            
+
             if (a.firstPoint.Position == a1.secondPoint.Position)
             {
                 edges[2] = a1;
@@ -160,7 +157,7 @@ namespace Objects
             {
                 edges[2] = a1.Reverse();
             }
-            
+
             if (a.secondPoint.Position == a2.firstPoint.Position)
             {
                 edges[1] = a2;
@@ -169,7 +166,7 @@ namespace Objects
             {
                 edges[1] = a2.Reverse();
             }
-            
+
             if (a.firstPoint.Position == a2.secondPoint.Position)
             {
                 edges[2] = a2;
@@ -178,6 +175,54 @@ namespace Objects
             {
                 edges[2] = a2.Reverse();
             }
+        }
+
+        float sign(Point p1, Point p2, Point p3)
+        {
+            return (p1.Position.x - p3.Position.x) * (p2.Position.y - p3.Position.y) -
+                   (p2.Position.x - p3.Position.x) * (p1.Position.y - p3.Position.y);
+        }
+
+        public bool IsInside(Point p)
+        {
+            Vector3 p0 = edges[0].firstPoint.Position;
+            Vector3 p1 = edges[1].firstPoint.Position;
+            Vector3 p2 = edges[2].firstPoint.Position;
+            double area = 0.5 * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y);
+
+            double s = 1 / (2 * area) *
+                       (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.Position.x + (p0.x - p2.x) * p.Position.y);
+
+            double t = 1 / (2 * area) *
+                       (p0.x * p1.y - p0.y * p1.x + (p0.y - p1.y) * p.Position.x + (p1.x - p0.x) * p.Position.y);
+
+            return (s >= 0 && s <= 1 && t >= 0 && t <= 1 && (s + t) <= 1);
+
+            // float d1, d2, d3;
+            // bool has_neg, has_pos;
+            //
+            // d1 = sign(pt, v1, v2);
+            // d2 = sign(pt, v2, v3);
+            // d3 = sign(pt, v3, v1);
+            //
+            // has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+            // has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+            //
+            // return !(has_neg && has_pos);
+
+            // foreach (var t in edges)
+            // {
+            //     Vector3 normal = Vector3.Cross((t.secondPoint.Position - t.firstPoint.Position).normalized,
+            //         Vector3.forward);
+            //     Vector3 vectorToPoint = p.Position - t.firstPoint.Position;
+            //     float dotProduct = Vector3.Dot(normal.normalized, vectorToPoint);
+            //     if (dotProduct > 0)
+            //     {
+            //         return false;
+            //     }
+            // }
+            //
+            // return true;
         }
     }
 }
